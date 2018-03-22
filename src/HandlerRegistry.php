@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-final class HandlerMap
+final class HandlerRegistry
 {
     /**
      * @var ArgumentsResolver
@@ -66,6 +66,6 @@ final class HandlerMap
             return $callable;
         }
 
-        return Handler::define($callable, $this->resolver->resolve($callable));
+        return new Handler($callable, $this->resolver->resolve($callable));
     }
 }

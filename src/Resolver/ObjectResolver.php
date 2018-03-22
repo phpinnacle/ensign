@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Resolver;
 
-class ObjectResolver extends ReflectionResolver
+final class ObjectResolver extends ReflectionResolver
 {
     /**
      * @var object[]
@@ -24,11 +24,7 @@ class ObjectResolver extends ReflectionResolver
      */
     public function __construct(array $objects)
     {
-        $objects = \array_filter($objects, 'is_object');
-
-        $this->objects = \array_combine(\array_map(function ($object) {
-            return \get_class($object);
-        }, $objects), $objects);
+        $this->objects = \array_filter($objects, '\is_object');
     }
 
     /**

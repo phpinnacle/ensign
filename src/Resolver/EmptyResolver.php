@@ -15,7 +15,7 @@ namespace PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\ArgumentsResolver;
 
-class EmptyResolver implements ArgumentsResolver
+final class EmptyResolver implements ArgumentsResolver
 {
     /**
      * {@inheritdoc}

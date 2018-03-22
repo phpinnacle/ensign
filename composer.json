@@ -29,8 +29,7 @@
             "PHPinnacle\\Ensign\\": "src"
         },
         "files": [
-            "src/functions.php",
-            "src/async.php"
+            "src/functions.php"
         ]
     },
     "autoload-dev": {

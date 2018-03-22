@@ -17,6 +17,27 @@ class ArgumentsTest extends EnsignTest
     /**
      * @test
      *
+     * Test that Arguments can be created from array
+     */
+    public function create()
+    {
+        $list = [
+            1,
+            'string',
+            true,
+            fopen('php://memory', 'r'),
+            new \stdClass(),
+            ['key' => 'value'],
+        ];
+
+        $arguments = new Arguments($list);
+
+        self::assertEquals($list, iterator_to_array($arguments));
+    }
+
+    /**
+     * @test
+     *
      * Test that Arguments can be created with no data
      */
     public function empty()
@@ -30,34 +51,12 @@ class ArgumentsTest extends EnsignTest
     /**
      * @test
      *
-     * Test that Arguments can be created from array
-     */
-    public function list()
-    {
-        $list = [
-            1,
-            'string',
-            true,
-            fopen('php://memory', 'r'),
-            new \stdClass(),
-            ['key' => 'value'],
-        ];
-
-        $arguments = Arguments::list($list);
-
-        self::assertInstanceOf(Arguments::class, $arguments);
-        self::assertEquals($list, iterator_to_array($arguments));
-    }
-
-    /**
-     * @test
-     *
      * Test that Arguments can be injected with others
      */
     public function inject()
     {
-        $arguments = Arguments::list(['one', 'two', 'three']);
-        $arguments = $arguments->inject(Arguments::list([1 => 'replace']));
+        $arguments = new Arguments(['one', 'two', 'three']);
+        $arguments = $arguments->inject(new Arguments([1 => 'replace']));
 
         self::assertEquals(['one', 'replace', 'two', 'three'], iterator_to_array($arguments));
     }
@@ -69,7 +68,7 @@ class ArgumentsTest extends EnsignTest
      */
     public function count()
     {
-        $arguments = Arguments::list(['one', 'two', 'three']);
+        $arguments = new Arguments(['one', 'two', 'three']);
 
         self::assertCount(3, $arguments);
     }

@@ -22,9 +22,9 @@ class HandlerTest extends EnsignTest
      */
     public function invoke()
     {
-        $handler = Handler::define(function ($value, $num = 1) {
+        $handler = new Handler(function ($value, $num = 1) {
             return $value + $num;
-        }, Arguments::list([1]));
+        }, new Arguments([1]));
 
         $resultOne = $handler();
         $resultTwo = $handler(2);

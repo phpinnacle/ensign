@@ -12,8 +12,9 @@ namespace PHPinnacle\Ensign\Tests\Resolver;
 
 use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\Resolver;
-use PHPinnacle\Ensign\StaticDispatcher;
+use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use Psr\Container\ContainerInterface;
 
@@ -33,7 +34,7 @@ class ContainerResolverTest extends EnsignTest
         ;
         $container
             ->method('get', Dispatcher::class)
-            ->willReturn($dispatcher = StaticDispatcher::instance())
+            ->willReturn($dispatcher = new SignalDispatcher(new HandlerRegistry()))
         ;
 
         $resolver = new Resolver\ContainerResolver($container);

@@ -12,17 +12,21 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
+use Amp\LazyPromise;
+use Amp\Coroutine;
+use Amp\Promise;
+
 final class SignalDispatcher implements Dispatcher
 {
     /**
-     * @var HandlerMap
+     * @var HandlerRegistry
      */
     private $handlers;
 
     /**
-     * @param HandlerMap $handlers
+     * @param HandlerRegistry $handlers
      */
-    public function __construct(HandlerMap $handlers)
+    public function __construct(HandlerRegistry $handlers)
     {
         $this->handlers = $handlers;
     }
@@ -30,31 +34,72 @@ final class SignalDispatcher implements Dispatcher
     /**
      * {@inheritdoc}
      */
-    public function dispatch(string $signal, ...$arguments): Task
+    public function dispatch($signal, ...$arguments): Promise
     {
-        $handler = $this->handler($signal);
-        $channel = Channel::open($signal);
+        if (!$signal instanceof Signal) {
+            $signal = Signal::create($signal, $arguments);
+        }
 
-        $promise = \future(function () use ($channel, $handler, $arguments) {
-            $result = $handler(...$arguments);
+        return new LazyPromise(function () use ($signal) {
+            $handler = $this->handler($signal);
+            $result  = $handler(...$signal->arguments());
 
-            if ($result instanceof \Generator) {
-                $result = \coroutine($channel->attach($result));
-            }
-
-            return $result;
+            return $result instanceof \Generator ? new Coroutine($this->recoil($result)) : $result;
         });
-
-        return new Task($promise, $channel);
     }
 
     /**
-     * @param string $signal
+     * @param Signal $signal
      *
      * @return Handler
      */
-    private function handler(string $signal): Handler
+    private function handler(Signal $signal): Handler
     {
-        return $this->handlers->get($signal) ?: Handler::unknown($signal);
+        $name = $signal->name();
+
+        return $this->handlers->get($name) ?: Handler::unknown($name);
+    }
+
+    /**
+     * @param \Generator $generator
+     *
+     * @return mixed
+     */
+    private function recoil(\Generator $generator)
+    {
+        while ($generator->valid()) {
+            try {
+                $key     = $generator->key();
+                $current = $generator->current();
+
+                $generator->send(yield $this->adapt($key, $current));
+            } catch (\Exception $error) {
+                /** @scrutinizer ignore-call */
+                $generator->throw($error);
+            }
+        }
+
+        return $generator->getReturn();
+    }
+
+    /**
+     * @param int|string $key
+     * @param mixed      $value
+     *
+     * @return mixed
+     */
+    private function adapt($key, $value)
+    {
+        if ($value instanceof Signal) {
+            return $this->dispatch($value);
+        }
+
+        if (\is_string($key)) {
+            $current = \is_array($value) ? \array_values($value) : [$value];
+
+            return $this->dispatch($key, ...$current);
+        }
+
+        return $value;
     }
 }

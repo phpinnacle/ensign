@@ -26,7 +26,9 @@ class ObjectResolverTest extends EnsignTest
         $object = new \stdClass;
         $object->data = 42;
 
-        $resolver = new Resolver\ObjectResolver([$object]);
+        $resolver = new Resolver\ObjectResolver([
+            \stdClass::class => $object
+        ]);
 
         $arguments = $resolver->resolve(function (\stdClass $object, int $value) {
             return [$object, $value];

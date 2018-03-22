@@ -1,17 +1,18 @@
 <?php
 
-use PHPinnacle\Ensign\HandlerMap;
+use Amp\Delayed;
+use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $handlers = new HandlerMap();
-    $handlers->register('emit', function (string $string, int $num, int $delay) {
+    $handlers = new HandlerRegistry();
+    $handlers->register('emit', function (string $string, int $num, int $delay = 100) {
         for ($i = 0; $i < $num; $i++) {
             echo $string;
 
-            yield new Amp\Delayed($delay);
+            yield new Delayed($delay);
         }
 
         return $num;
@@ -19,8 +20,9 @@ Amp\Loop::run(function () {
 
     $dispatcher = new SignalDispatcher($handlers);
 
-    $taskOne = $dispatcher->dispatch('emit', '+', 10, 100);
-    $taskTwo = $dispatcher->dispatch('emit', '-', 5, 100);
+    $times = \rand(5, 10);
+    $taskOne = $dispatcher->dispatch('emit', '-', $times, 100);
+    $taskTwo = $dispatcher->dispatch('emit', '+', $times + \rand(5, 10), 100);
 
     [$resultOne, $resultTwo] = yield [$taskOne, $taskTwo];
 

@@ -28,21 +28,10 @@ final class Handler
      * @param callable  $callable
      * @param Arguments $arguments
      */
-    private function __construct(callable $callable, Arguments $arguments)
+    public function __construct(callable $callable, Arguments $arguments = null)
     {
         $this->callable  = $callable;
-        $this->arguments = $arguments;
-    }
-
-    /**
-     * @param callable       $callable
-     * @param Arguments|null $arguments
-     *
-     * @return self
-     */
-    public static function define(callable $callable, Arguments $arguments = null): self
-    {
-        return new self($callable, $arguments ?: Arguments::empty());
+        $this->arguments = $arguments ?: Arguments::empty();
     }
 
     /**
@@ -52,7 +41,7 @@ final class Handler
      */
     public static function error(\Exception $error): self
     {
-        return self::define(function () use ($error) {
+        return new self(function () use ($error) {
             throw $error;
         });
     }
@@ -75,7 +64,7 @@ final class Handler
     public function __invoke(...$arguments)
     {
         $callable  = $this->callable;
-        $arguments = Arguments::list($arguments)->inject($this->arguments);
+        $arguments = (new Arguments($arguments))->inject($this->arguments);
 
         return $callable(...$arguments);
     }
