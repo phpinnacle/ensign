@@ -11,13 +11,13 @@
 namespace PHPinnacle\Ensign\Tests;
 
 use PHPinnacle\Ensign\Handler;
-use PHPinnacle\Ensign\HandlerMap;
+use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\Resolver;
 
-class HandlerMapTest extends EnsignTest
+class HandlerRegistryTest extends EnsignTest
 {
     /**
-     * Test that HandlerMap can register callable and return handler
+     * Test that HandlerRegistry can register callable and return Handler
      *
      * @param $name
      * @param $value
@@ -27,7 +27,7 @@ class HandlerMapTest extends EnsignTest
      */
     public function registerCallable($name, $value)
     {
-        $handlers = new HandlerMap();
+        $handlers = new HandlerRegistry();
         $handlers->register($name, function ($value) {
             return $value + 1;
         });
@@ -37,24 +37,24 @@ class HandlerMapTest extends EnsignTest
     }
 
     /**
-     * Test that HandlerMap can register Handler
+     * Test that HandlerRegistry can register Handler
      *
      * @test
      */
     public function registerHandler()
     {
-        $handler = Handler::define(function () {
+        $handler = new Handler(function () {
             return 'test';
         });
 
-        $handlers = new HandlerMap();
+        $handlers = new HandlerRegistry();
         $handlers->register('test', $handler);
 
         self::assertSame($handler, $handlers->get('test'));
     }
 
     /**
-     * Test that HandlerMap try resolving Arguments for handler
+     * Test that HandlerRegistry try resolving Arguments for handler
      *
      * @param $name
      * @param $value
@@ -71,7 +71,7 @@ class HandlerMapTest extends EnsignTest
             \stdClass::class => $object
         ]);
 
-        $handlers = new HandlerMap($resolver);
+        $handlers = new HandlerRegistry($resolver);
         $handlers->register($name, function (\stdClass $object, $value) {
             return $object->data + $value;
         });

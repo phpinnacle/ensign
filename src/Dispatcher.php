@@ -12,13 +12,15 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
+use Amp\Promise;
+
 interface Dispatcher
 {
     /**
-     * @param string    $signal
-     * @param mixed  ...$arguments
+     * @param string|object    $signal
+     * @param mixed         ...$arguments
      *
-     * @return Task
+     * @return Promise
      */
-    public function dispatch(string $signal, ...$arguments): Task;
+    public function dispatch($signal, ...$arguments): Promise;
 }

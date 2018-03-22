@@ -10,9 +10,53 @@
 
 declare(strict_types = 1);
 
-use PHPinnacle\Ensign\Task;
+use Amp\Promise;
+use PHPinnacle\Ensign\HandlerRegistry;
+use PHPinnacle\Ensign\Signal;
+use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\StaticDispatcher;
+
+final class StaticDispatcher implements Dispatcher
+{
+    private static $instance;
+    private $handlers;
+    private $dispatcher;
+
+    private function __construct()
+    {
+        $this->handlers   = new HandlerRegistry();
+        $this->dispatcher = new SignalDispatcher($this->handlers);
+    }
+
+    public static function instance(): self
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    public function register(string $signal, callable $action): void
+    {
+        $this->handlers->register($signal, $action);
+    }
+
+    public function dispatch($signal, ...$arguments): Promise
+    {
+        return $this->dispatcher->dispatch($signal, ...$arguments);
+    }
+}
+
+/**
+ * @param mixed    $signal
+ * @param mixed ...$arguments
+ * @return Signal
+ */
+function ensign_send($signal, ...$arguments)
+{
+    return Signal::create($signal, $arguments);
+}
 
 /**
  * @param string   $signal
@@ -27,9 +71,9 @@ function ensign_signal(string $signal, callable $handler): void
  * @param string    $signal
  * @param mixed  ...$arguments
  *
- * @return Task
+ * @return Promise
  */
-function ensign_dispatch(string $signal, ...$arguments): Task
+function ensign_dispatch(string $signal, ...$arguments): Promise
 {
     return StaticDispatcher::instance()->dispatch($signal, ...$arguments);
 }

@@ -1,6 +1,7 @@
 <?php
 
-use PHPinnacle\Ensign\HandlerMap;
+use Amp\Delayed;
+use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -15,41 +16,39 @@ class SimpleEvent
     }
 }
 
+class SimpleCommand
+{
+    public $num;
+    public $delay;
+
+    public function __construct(int $num, int $delay = 100)
+    {
+        $this->num   = $num;
+        $this->delay = $delay;
+    }
+}
+
 Amp\Loop::run(function () {
-    $handlers = new HandlerMap();
-    $handlers->register('emit', function (int $num) {
-        yield new SimpleEvent($num - 1);
-        yield new Amp\Delayed(1000); // Just do some heavy calculations
+    $handlers = new HandlerRegistry();
+    $handlers
+        ->register(SimpleCommand::class, function (SimpleCommand $cmd) {
+            yield new Delayed($cmd->delay); // Just do some heavy calculations
+            yield SimpleEvent::class => new SimpleEvent($cmd->num + $cmd->num);
 
-        yield new SimpleEvent($num * $num);
-        yield new Amp\Delayed(1000); // Do more work
+            yield new Delayed($cmd->delay); // Do more work
+            yield ensign_send(new SimpleEvent($cmd->num * $cmd->num));
 
-        $event = new SimpleEvent($num + $num);
-
-        yield $event;
-
-        return $num;
-    });
+            return $cmd->num;
+        })
+        ->register(SimpleEvent::class, function (SimpleEvent $event) {
+            echo \sprintf('Signal dispatched with value: %d at %s' . \PHP_EOL, $event->num, \microtime(true));
+        })
+    ;
 
     $dispatcher = new SignalDispatcher($handlers);
 
-    $task = $dispatcher->dispatch('emit', 10);
-    $task->onResolve(function (\Throwable $error = null, $data) {
-        echo \sprintf('Task resolved with value: %d at %s' . \PHP_EOL, $data, \microtime(true));
-    });
+    $task = $dispatcher->dispatch(new SimpleCommand(10));
+    $data = yield $task;
 
-    $eventOne = $task->wait(SimpleEvent::class);
-    $eventOne->onResolve(function (\Throwable $error = null, SimpleEvent $event = null) {
-        echo \sprintf('Event one resolved with value: %d at %s' . \PHP_EOL, $event->num, \microtime(true));
-    });
-
-    $eventTwo = $task->wait(SimpleEvent::class);
-    $eventTwo->onResolve(function (\Throwable $error = null, SimpleEvent $event = null) {
-        echo \sprintf('Event two resolved with value: %d at %s' . \PHP_EOL, $event->num, \microtime(true));
-    });
-
-    $eventThree = $task->wait(SimpleEvent::class);
-    $eventThree->onResolve(function (\Throwable $error = null, SimpleEvent $event = null) {
-        echo \sprintf('Event three resolved with value: %d at %s' . \PHP_EOL, $event->num, \microtime(true));
-    });
+    echo \sprintf('Task resolved with value: %d at %s' . \PHP_EOL, $data, \microtime(true));
 });

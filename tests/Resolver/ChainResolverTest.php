@@ -31,8 +31,12 @@ class ChainResolverTest extends EnsignTest
         $event->data = 'test';
 
         $resolver = new Resolver\ChainResolver(
-            new Resolver\ObjectResolver([$object]),
-            new Resolver\ObjectResolver([$event])
+            new Resolver\ObjectResolver([
+                \stdClass::class => $object,
+            ]),
+            new Resolver\ObjectResolver([
+                Stub\SimpleEvent::class => $event,
+            ])
         );
 
         $arguments = $resolver->resolve(function (Stub\SimpleEvent $event, \stdClass $object, int $int) {});

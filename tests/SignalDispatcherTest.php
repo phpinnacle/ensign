@@ -10,8 +10,8 @@
 
 namespace PHPinnacle\Ensign\Tests;
 
-use PHPinnacle\Ensign\Task;
-use PHPinnacle\Ensign\HandlerMap;
+use PHPinnacle\Ensign\HandlerRegistry;
+use PHPinnacle\Ensign\Signal;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 class SignalDispatcherTest extends EnsignTest
@@ -24,7 +24,7 @@ class SignalDispatcherTest extends EnsignTest
     public function dispatchSignals()
     {
         self::loop(function () {
-            $handlers = new HandlerMap();
+            $handlers = new HandlerRegistry();
             $handlers
                 ->register('upper', function ($text) {
                     return strtoupper($text);
@@ -36,8 +36,8 @@ class SignalDispatcherTest extends EnsignTest
 
             $dispatcher = new SignalDispatcher($handlers);
 
-            self::assertInstanceOf(Task::class, $upperTask = $dispatcher->dispatch('upper', 'test'));
-            self::assertInstanceOf(Task::class, $lowerTask = $dispatcher->dispatch('lower', 'TEST'));
+            self::assertPromise($upperTask = $dispatcher->dispatch('upper', 'test'));
+            self::assertPromise($lowerTask = $dispatcher->dispatch('lower', 'TEST'));
 
             self::assertEquals('TEST', yield $upperTask);
             self::assertEquals('test', yield $lowerTask);
@@ -47,35 +47,42 @@ class SignalDispatcherTest extends EnsignTest
     /**
      * @test
      *
-     * Test that Dispatcher can dispatch signal to coroutine
+     * Test that Dispatcher can dispatch signal from coroutine
      */
-    public function dispatchSignalToCoroutine()
+    public function dispatchSignalFromCoroutine()
     {
         self::loop(function () {
-            $handlers = new HandlerMap();
+            $handlers = new HandlerRegistry();
             $handlers
                 ->register('coroutine', function ($count) {
-                    static $n = 1;
-
-                    for ($i = 1; $i <= $count; $i++) {
-                        $n *= $i;
-
-                        yield 'event_' . $i => $n;
+                    try {
+                        yield 'error' => $count;
+                    } catch (\Exception $error) {
+                        self::assertInstanceOf(\InvalidArgumentException::class, $error);
+                        self::assertEquals('3', $error->getMessage());
                     }
 
-                    return $n;
+                    yield new Signal('signal', $count - 1);
+
+                    yield 'event' => $count + 1;
+
+                    return $count * 2;
+                })
+                ->register('error', function ($num) {
+                    throw new \InvalidArgumentException((string) $num);
+                })
+                ->register('signal', function ($num) {
+                    self::assertEquals(2, $num);
+                })
+                ->register('event', function ($num) {
+                    self::assertEquals(4, $num);
                 })
             ;
 
             $dispatcher = new SignalDispatcher($handlers);
 
-            self::assertInstanceOf(Task::class, $task = $dispatcher->dispatch('coroutine', 3));
+            self::assertPromise($task = $dispatcher->dispatch('coroutine', 3));
             self::assertEquals(6, yield $task);
-            self::assertEquals([
-                'event_1' => [1],
-                'event_2' => [2],
-                'event_3' => [6],
-            ], iterator_to_array($task));
         });
     }
 
@@ -88,11 +95,33 @@ class SignalDispatcherTest extends EnsignTest
     public function dispatchUnknownSignal()
     {
         self::loop(function () {
-            $dispatcher = new SignalDispatcher(new HandlerMap());
+            $dispatcher = new SignalDispatcher(new HandlerRegistry());
 
-            self::assertInstanceOf(Task::class, $failure = $dispatcher->dispatch('unknown'));
+            self::assertPromise($failure = $dispatcher->dispatch('unknown'));
 
             yield $failure;
+        });
+    }
+
+    /**
+     * Test that Dispatcher can handle not registered signals
+     *
+     * @test
+     * @expectedException \Amp\InvalidYieldError
+     */
+    public function invalidYieldValue()
+    {
+        self::loop(function () {
+            $handlers = new HandlerRegistry();
+            $handlers
+                ->register('invalid', function () {
+                    yield 'test';
+                })
+            ;
+
+            $dispatcher = new SignalDispatcher($handlers);
+
+            yield $dispatcher->dispatch('invalid');
         });
     }
 }

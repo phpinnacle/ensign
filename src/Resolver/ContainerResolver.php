@@ -14,7 +14,7 @@ namespace PHPinnacle\Ensign\Resolver;
 
 use Psr\Container\ContainerInterface;
 
-class ContainerResolver extends ReflectionResolver
+final class ContainerResolver extends ReflectionResolver
 {
     /**
      * @var ContainerInterface

@@ -15,7 +15,7 @@ namespace PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\ArgumentsResolver;
 
-class ChainResolver implements ArgumentsResolver
+final class ChainResolver implements ArgumentsResolver
 {
     /**
      * @var ArgumentsResolver[]

@@ -36,7 +36,7 @@ abstract class ReflectionResolver implements ArgumentsResolver
             }
         }
 
-        return Arguments::list($arguments);
+        return new Arguments($arguments);
     }
 
     /**

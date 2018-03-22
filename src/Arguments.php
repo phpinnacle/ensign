@@ -22,7 +22,7 @@ final class Arguments implements \IteratorAggregate, \Countable
     /**
      * @param array $list
      */
-    private function __construct(array $list)
+    public function __construct(array $list)
     {
         $this->list = $list;
     }
@@ -36,23 +36,13 @@ final class Arguments implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param array $arguments
-     *
-     * @return self
-     */
-    public static function list(array $arguments): self
-    {
-        return new self($arguments);
-    }
-
-    /**
      * @param Arguments $other
      *
      * @return self
      */
     public function merge(Arguments $other): self
     {
-        return self::list(\array_replace($this->list, $other->list));
+        return new self(\array_replace($this->list, $other->list));
     }
 
     /**
@@ -68,7 +58,7 @@ final class Arguments implements \IteratorAggregate, \Countable
             \array_splice($list, $position, 0, [$argument]);
         }
 
-        return self::list($list);
+        return new self($list);
     }
 
     /**
