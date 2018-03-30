@@ -40,7 +40,7 @@ Amp\Loop::run(function () {
 });
 ```
 
-More examples can be found in `examples` directory.
+More examples can be found in [`examples`](examples) directory.
 
 ## Change log
 
