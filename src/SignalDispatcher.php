@@ -14,7 +14,6 @@ namespace PHPinnacle\Ensign;
 
 use Amp\LazyPromise;
 use Amp\Coroutine;
-use Amp\Promise;
 
 final class SignalDispatcher implements Dispatcher
 {
@@ -34,18 +33,20 @@ final class SignalDispatcher implements Dispatcher
     /**
      * {@inheritdoc}
      */
-    public function dispatch($signal, ...$arguments): Promise
+    public function dispatch($signal, ...$arguments): Task
     {
         if (!$signal instanceof Signal) {
             $signal = Signal::create($signal, $arguments);
         }
 
-        return new LazyPromise(function () use ($signal) {
+        $token = new TaskToken();
+
+        return new Task(new LazyPromise(function () use ($signal, $token) {
             $handler = $this->handler($signal);
             $result  = $handler(...$signal->arguments());
 
-            return $result instanceof \Generator ? new Coroutine($this->recoil($result)) : $result;
-        });
+            return $result instanceof \Generator ? new Coroutine($this->recoil($result, $token)) : $result;
+        }), $token);
     }
 
     /**
@@ -62,12 +63,15 @@ final class SignalDispatcher implements Dispatcher
 
     /**
      * @param \Generator $generator
+     * @param TaskToken  $token
      *
      * @return mixed
      */
-    private function recoil(\Generator $generator)
+    private function recoil(\Generator $generator, TaskToken $token)
     {
         while ($generator->valid()) {
+            $token->guard();
+
             try {
                 $key     = $generator->key();
                 $current = $generator->current();

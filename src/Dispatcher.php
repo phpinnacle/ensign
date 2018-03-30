@@ -20,7 +20,7 @@ interface Dispatcher
      * @param string|object    $signal
      * @param mixed         ...$arguments
      *
-     * @return Promise
+     * @return Task
      */
-    public function dispatch($signal, ...$arguments): Promise;
+    public function dispatch($signal, ...$arguments): Task;
 }

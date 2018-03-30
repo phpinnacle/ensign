@@ -15,6 +15,7 @@ use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\Signal;
 use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\Task;
 
 final class StaticDispatcher implements Dispatcher
 {
@@ -42,7 +43,7 @@ final class StaticDispatcher implements Dispatcher
         $this->handlers->register($signal, $action);
     }
 
-    public function dispatch($signal, ...$arguments): Promise
+    public function dispatch($signal, ...$arguments): Task
     {
         return $this->dispatcher->dispatch($signal, ...$arguments);
     }
