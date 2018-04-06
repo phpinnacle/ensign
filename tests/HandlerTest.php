@@ -24,12 +24,12 @@ class HandlerTest extends EnsignTest
     {
         $handler = new Handler(function ($value, $num = 1) {
             return $value + $num;
-        }, new Arguments([1]));
+        });
 
-        $resultOne = $handler();
+        $resultOne = $handler(1, 2);
         $resultTwo = $handler(2);
 
-        self::assertEquals(2, $resultOne);
+        self::assertEquals(3, $resultOne);
         self::assertEquals(3, $resultTwo);
     }
 

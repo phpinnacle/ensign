@@ -24,8 +24,8 @@ class Stop
 }
 
 Amp\Loop::run(function () {
-    $handlers = new HandlerRegistry();
-    $handlers
+    $dispatcher = new SignalDispatcher();
+    $dispatcher
         ->register(Ping::class, function (Ping $cmd) {
             if ($cmd->times > 0) {
                 $cmd->times--;
@@ -46,8 +46,6 @@ Amp\Loop::run(function () {
             echo 'Stop!' . \PHP_EOL;
         })
     ;
-
-    $dispatcher = new SignalDispatcher($handlers);
 
     yield $dispatcher->dispatch(new Ping(\rand(2, 10)));
 });

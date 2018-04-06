@@ -29,9 +29,14 @@ abstract class ReflectionResolver implements ArgumentsResolver
         $parameters = $reflection->getParameters();
 
         foreach ($parameters as $parameter) {
-            $class = $parameter->getClass();
+            if (!$class = $parameter->getClass()) {
+                continue;
+            }
 
-            if ($class && $instance = $this->resolveArgument($class)) {
+            $expected = $class->getName();
+            $instance = $this->resolveArgument($class);
+
+            if (\is_object($instance) && $instance instanceof $expected) {
                 $arguments[$parameter->getPosition()] = $instance;
             }
         }
@@ -44,5 +49,5 @@ abstract class ReflectionResolver implements ArgumentsResolver
      *
      * @return object
      */
-    abstract protected function resolveArgument(\ReflectionClass $class): ?object;
+    abstract protected function resolveArgument(\ReflectionClass $class);
 }

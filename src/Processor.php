@@ -12,13 +12,13 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-interface Dispatcher
+interface Processor
 {
     /**
-     * @param string|object    $signal
-     * @param mixed         ...$arguments
+     * @param callable $callable
+     * @param array    $arguments
      *
      * @return Task
      */
-    public function dispatch($signal, ...$arguments): Task;
+    public function execute(callable $callable, ...$arguments): Task;
 }

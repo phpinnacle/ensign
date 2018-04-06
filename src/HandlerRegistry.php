@@ -15,32 +15,19 @@ namespace PHPinnacle\Ensign;
 final class HandlerRegistry
 {
     /**
-     * @var ArgumentsResolver
-     */
-    private $resolver;
-
-    /**
      * @var Handler[]
      */
     private $handlers = [];
 
     /**
-     * @param ArgumentsResolver $resolver
-     */
-    public function __construct(ArgumentsResolver $resolver = null)
-    {
-        $this->resolver = $resolver ?: new Resolver\EmptyResolver();
-    }
-
-    /**
      * @param string   $name
-     * @param callable $callable
+     * @param callable $handler
      *
      * @return self
      */
-    public function register(string $name, callable $callable): self
+    public function register(string $name, callable $handler): self
     {
-        $this->handlers[$name] = $this->handler($callable);
+        $this->handlers[$name] = $handler instanceof Handler ? $handler : new Handler($handler);
 
         return $this;
     }
@@ -50,22 +37,8 @@ final class HandlerRegistry
      *
      * @return Handler|null
      */
-    public function get(string $name): ?Handler
+    public function acquire(string $name): ?Handler
     {
-        return $this->handlers[$name] ?? null;
-    }
-
-    /**
-     * @param callable $callable
-     *
-     * @return Handler
-     */
-    private function handler(callable $callable): Handler
-    {
-        if ($callable instanceof Handler) {
-            return $callable;
-        }
-
-        return new Handler($callable, $this->resolver->resolve($callable));
+        return $this->handlers[$name] ?? Handler::unknown($name);
     }
 }

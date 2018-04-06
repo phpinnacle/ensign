@@ -13,4 +13,9 @@ namespace PHPinnacle\Ensign\Tests\Stub;
 class SimpleEvent
 {
     public $data;
+
+    public function __construct($data = null)
+    {
+        $this->data = $data;
+    }
 }

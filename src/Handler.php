@@ -20,18 +20,11 @@ final class Handler
     private $callable;
 
     /**
-     * @var Arguments
-     */
-    private $arguments;
-
-    /**
      * @param callable  $callable
-     * @param Arguments $arguments
      */
-    public function __construct(callable $callable, Arguments $arguments = null)
+    public function __construct(callable $callable)
     {
         $this->callable  = $callable;
-        $this->arguments = $arguments ?: Arguments::empty();
     }
 
     /**
@@ -63,8 +56,7 @@ final class Handler
      */
     public function __invoke(...$arguments)
     {
-        $callable  = $this->callable;
-        $arguments = (new Arguments($arguments))->inject($this->arguments);
+        $callable = $this->callable;
 
         return $callable(...$arguments);
     }

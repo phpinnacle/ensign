@@ -7,20 +7,20 @@ use PHPinnacle\Ensign\SignalDispatcher;
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $handlers = new HandlerRegistry();
-    $handlers->register('emit', function (string $string, int $num, int $delay = 100) {
-        for ($i = 0; $i < $num; $i++) {
-            echo $string;
+    $dispatcher = new SignalDispatcher();
+    $dispatcher
+        ->register('emit', function (string $string, int $num, int $delay = 100) {
+            for ($i = 0; $i < $num; $i++) {
+                echo $string;
 
-            yield new Delayed($delay);
-        }
+                yield new Delayed($delay);
+            }
 
-        return $num;
-    });
+            return $num;
+        })
+    ;
 
-    $dispatcher = new SignalDispatcher($handlers);
-
-    $times = \rand(5, 10);
+    $times   = \rand(5, 10);
     $taskOne = $dispatcher->dispatch('emit', '-', $times, 100);
     $taskTwo = $dispatcher->dispatch('emit', '+', $times + \rand(5, 10), 100);
 

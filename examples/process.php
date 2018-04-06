@@ -7,8 +7,8 @@ use PHPinnacle\Ensign\SignalDispatcher;
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $handlers = new HandlerRegistry();
-    $handlers
+    $dispatcher = new SignalDispatcher();
+    $dispatcher
         ->register('spawn', function (callable $process) {
             static $pid = 1;
 
@@ -23,14 +23,12 @@ Amp\Loop::run(function () {
 
             return yield $signal => $arguments;
         })
-        ->register('receive', function (int $pid, string $message, callable $handler) use ($handlers) {
+        ->register('receive', function (int $pid, string $message, callable $handler) use ($dispatcher) {
             $signal = sprintf('%s.%d', $message, $pid);
 
-            $handlers->register($signal, $handler);
+            $dispatcher->register($signal, $handler);
         })
     ;
-
-    $dispatcher = new SignalDispatcher($handlers);
 
     $receiver = yield $dispatcher->dispatch('spawn', function (int $pid) {
         yield 'receive' => [$pid, 'ping', function () {

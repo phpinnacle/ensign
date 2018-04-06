@@ -32,7 +32,7 @@ final class ContainerResolver extends ReflectionResolver
     /**
      * {@inheritdoc}
      */
-    protected function resolveArgument(\ReflectionClass $class): ?object
+    protected function resolveArgument(\ReflectionClass $class)
     {
         return $this->container->has($class->getName()) ? $this->container->get($class->getName()) : null;
     }

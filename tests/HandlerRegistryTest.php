@@ -32,7 +32,7 @@ class HandlerRegistryTest extends EnsignTest
             return $value + 1;
         });
 
-        self::assertInstanceOf(Handler::class, $handler = $handlers->get($name));
+        self::assertInstanceOf(Handler::class, $handler = $handlers->acquire($name));
         self::assertEquals($value + 1, $handler($value));
     }
 
@@ -50,34 +50,7 @@ class HandlerRegistryTest extends EnsignTest
         $handlers = new HandlerRegistry();
         $handlers->register('test', $handler);
 
-        self::assertSame($handler, $handlers->get('test'));
-    }
-
-    /**
-     * Test that HandlerRegistry try resolving Arguments for handler
-     *
-     * @param $name
-     * @param $value
-     *
-     * @test
-     * @dataProvider handlersList
-     */
-    public function registerHandlerWithArgumentsResolving($name, $value)
-    {
-        $object = new \stdClass;
-        $object->data = 42;
-
-        $resolver = new Resolver\ObjectResolver([
-            \stdClass::class => $object
-        ]);
-
-        $handlers = new HandlerRegistry($resolver);
-        $handlers->register($name, function (\stdClass $object, $value) {
-            return $object->data + $value;
-        });
-
-        self::assertInstanceOf(Handler::class, $handler = $handlers->get($name));
-        self::assertEquals(42 + $value, $handler($value));
+        self::assertSame($handler, $handlers->acquire('test'));
     }
 
     /**
