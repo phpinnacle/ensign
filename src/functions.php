@@ -11,8 +11,6 @@
 declare(strict_types = 1);
 
 use Amp\Promise;
-use PHPinnacle\Ensign\HandlerRegistry;
-use PHPinnacle\Ensign\Signal;
 use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Dispatcher;
 use PHPinnacle\Ensign\Task;
@@ -20,13 +18,11 @@ use PHPinnacle\Ensign\Task;
 final class StaticDispatcher implements Dispatcher
 {
     private static $instance;
-    private $handlers;
     private $dispatcher;
 
     private function __construct()
     {
-        $this->handlers   = new HandlerRegistry();
-        $this->dispatcher = new SignalDispatcher($this->handlers);
+        $this->dispatcher = new SignalDispatcher();
     }
 
     public static function instance(): self
@@ -40,23 +36,13 @@ final class StaticDispatcher implements Dispatcher
 
     public function register(string $signal, callable $action): void
     {
-        $this->handlers->register($signal, $action);
+        $this->dispatcher->register($signal, $action);
     }
 
     public function dispatch($signal, ...$arguments): Task
     {
         return $this->dispatcher->dispatch($signal, ...$arguments);
     }
-}
-
-/**
- * @param mixed    $signal
- * @param mixed ...$arguments
- * @return Signal
- */
-function ensign_send($signal, ...$arguments)
-{
-    return Signal::create($signal, $arguments);
 }
 
 /**
@@ -82,6 +68,8 @@ function ensign_dispatch(string $signal, ...$arguments): Promise
 /**
  * @param array      $signals
  * @param Dispatcher $dispatcher
+ *
+ * @throws \Amp\Loop\UnsupportedFeatureException
  */
 function ensign_pcntl_signals(array $signals, Dispatcher $dispatcher = null): void
 {

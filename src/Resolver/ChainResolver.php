@@ -23,7 +23,7 @@ final class ChainResolver implements ArgumentsResolver
     private $resolvers;
 
     /**
-     * @param ArgumentsResolver[] ...$resolvers
+     * @param ArgumentsResolver ...$resolvers
      */
     public function __construct(ArgumentsResolver ...$resolvers)
     {

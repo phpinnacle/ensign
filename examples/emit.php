@@ -29,14 +29,14 @@ class SimpleCommand
 }
 
 Amp\Loop::run(function () {
-    $handlers = new HandlerRegistry();
-    $handlers
+    $dispatcher = new SignalDispatcher();
+    $dispatcher
         ->register(SimpleCommand::class, function (SimpleCommand $cmd) {
             yield new Delayed($cmd->delay); // Just do some heavy calculations
             yield SimpleEvent::class => new SimpleEvent($cmd->num + $cmd->num);
 
             yield new Delayed($cmd->delay); // Do more work
-            yield ensign_send(new SimpleEvent($cmd->num * $cmd->num));
+            yield SimpleEvent::class => new SimpleEvent($cmd->num * $cmd->num);
 
             return $cmd->num;
         })
@@ -44,8 +44,6 @@ Amp\Loop::run(function () {
             echo \sprintf('Signal dispatched with value: %d at %s' . \PHP_EOL, $event->num, \microtime(true));
         })
     ;
-
-    $dispatcher = new SignalDispatcher($handlers);
 
     $task = $dispatcher->dispatch(new SimpleCommand(10));
     $data = yield $task;

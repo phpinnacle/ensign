@@ -34,7 +34,7 @@ class ContainerResolverTest extends EnsignTest
         ;
         $container
             ->method('get', Dispatcher::class)
-            ->willReturn($dispatcher = new SignalDispatcher(new HandlerRegistry()))
+            ->willReturn($dispatcher = new SignalDispatcher())
         ;
 
         $resolver = new Resolver\ContainerResolver($container);

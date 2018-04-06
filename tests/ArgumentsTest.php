@@ -32,7 +32,7 @@ class ArgumentsTest extends EnsignTest
 
         $arguments = new Arguments($list);
 
-        self::assertEquals($list, iterator_to_array($arguments));
+        self::assertEquals($list, \iterator_to_array($arguments));
     }
 
     /**
@@ -45,7 +45,7 @@ class ArgumentsTest extends EnsignTest
         $arguments = Arguments::empty();
 
         self::assertInstanceOf(Arguments::class, $arguments);
-        self::assertEquals([], iterator_to_array($arguments));
+        self::assertEquals([], \iterator_to_array($arguments));
     }
 
     /**
@@ -58,13 +58,13 @@ class ArgumentsTest extends EnsignTest
         $arguments = new Arguments(['one', 'two', 'three']);
         $arguments = $arguments->inject(new Arguments([1 => 'replace']));
 
-        self::assertEquals(['one', 'replace', 'two', 'three'], iterator_to_array($arguments));
+        self::assertEquals(['one', 'replace', 'two', 'three'], \iterator_to_array($arguments));
     }
 
     /**
      * @test
      *
-     * Test that Arguments can counted
+     * Test that Arguments can be counted
      */
     public function count()
     {

@@ -30,7 +30,7 @@ final class ObjectResolver extends ReflectionResolver
     /**
      * {@inheritdoc}
      */
-    protected function resolveArgument(\ReflectionClass $class): ?object
+    protected function resolveArgument(\ReflectionClass $class)
     {
         return $this->objects[$class->getName()] ?? null;
     }
