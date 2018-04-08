@@ -92,6 +92,10 @@ final class TaskProcessor implements Processor
      */
     private function interrupt($key, $value)
     {
+        if (!\is_string($key) && \is_object($value)) {
+            $key = \get_class($value);
+        }
+
         if (isset($this->interruptions[$key])) {
             $interceptor = $this->interruptions[$key];
 

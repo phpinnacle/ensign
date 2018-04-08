@@ -78,15 +78,15 @@ class SignalDispatcherTest extends EnsignTest
                         self::assertEquals('3', $error->getMessage());
                     }
 
-                    yield 'event' => $count + 1;
+                    yield new Stub\SimpleEvent($count + 1);
 
                     return $count * 2;
                 })
                 ->register('error', function ($num) {
                     throw new \InvalidArgumentException((string) $num);
                 })
-                ->register('event', function ($num) {
-                    self::assertEquals(4, $num);
+                ->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+                    self::assertEquals(4, $event->data);
                 })
             ;
 

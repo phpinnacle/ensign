@@ -24,7 +24,7 @@ final class Handler
      */
     public function __construct(callable $callable)
     {
-        $this->callable  = $callable;
+        $this->callable = $callable;
     }
 
     /**

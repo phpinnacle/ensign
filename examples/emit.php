@@ -36,7 +36,7 @@ Amp\Loop::run(function () {
             yield SimpleEvent::class => new SimpleEvent($cmd->num + $cmd->num);
 
             yield new Delayed($cmd->delay); // Do more work
-            yield SimpleEvent::class => new SimpleEvent($cmd->num * $cmd->num);
+            yield new SimpleEvent($cmd->num * $cmd->num);
 
             return $cmd->num;
         })

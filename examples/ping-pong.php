@@ -32,15 +32,15 @@ Amp\Loop::run(function () {
 
                 echo 'Ping!' . \PHP_EOL;
 
-                yield Pong::class => new Pong($cmd->times);
+                yield new Pong($cmd->times);
             } else {
-                yield Stop::class => new Stop();
+                yield new Stop();
             }
         })
         ->register(Pong::class, function (Pong $cmd) {
             echo 'Pong!' . \PHP_EOL;
 
-            yield Ping::class => new Ping($cmd->times);
+            yield new Ping($cmd->times);
         })
         ->register(Stop::class, function () {
             echo 'Stop!' . \PHP_EOL;
