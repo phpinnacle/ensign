@@ -53,10 +53,19 @@ final class TaskProcessor implements Processor
         $arguments = (new Arguments($arguments))->inject($this->resolver->resolve($callable));
 
         return new Task(new LazyPromise(function () use ($callable, $arguments, $token) {
-            $result = $callable(...$arguments);
-
-            return $result instanceof \Generator ? new Coroutine($this->recoil($result, $token)) : $result;
+            return $this->coroutine($callable(...$arguments), $token);
         }), $token);
+    }
+
+    /**
+     * @param mixed     $value
+     * @param TaskToken $token
+     *
+     * @return mixed
+     */
+    private function coroutine($value, TaskToken $token)
+    {
+        return $value instanceof \Generator ? new Coroutine($this->recoil($value, $token)) : $value;
     }
 
     /**
@@ -71,17 +80,17 @@ final class TaskProcessor implements Processor
             $token->guard();
 
             try {
-                $key     = $generator->key();
-                $current = $generator->current();
+                $key   = $generator->key();
+                $value = $this->interrupt($key, $generator->current());
 
-                $generator->send(yield $this->interrupt($key, $current));
+                $generator->send(yield $this->coroutine($value, $token));
             } catch (\Exception $error) {
                 /** @scrutinizer ignore-call */
                 $generator->throw($error);
             }
         }
 
-        return $generator->getReturn();
+        return $this->coroutine($generator->getReturn(), $token);
     }
 
     /**
