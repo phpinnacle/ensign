@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Exception;
 
-class UnknownSignal extends EnsignException
+final class UnknownSignal extends EnsignException
 {
     /**
      * @param string $signal

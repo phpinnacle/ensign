@@ -15,6 +15,12 @@ namespace PHPinnacle\Ensign;
 interface Processor
 {
     /**
+     * @param string   $interrupt
+     * @param callable $interrupter
+     */
+    public function interrupt(string $interrupt, callable $interrupter): void;
+
+    /**
      * @param callable $callable
      * @param array    $arguments
      *

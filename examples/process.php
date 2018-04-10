@@ -1,13 +1,12 @@
 <?php
 
 use Amp\Delayed;
-use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = new SignalDispatcher();
+    $dispatcher = SignalDispatcher::amp();
     $dispatcher
         ->register('spawn', function (callable $process) {
             static $pid = 1;

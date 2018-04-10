@@ -15,22 +15,38 @@ namespace PHPinnacle\Ensign;
 final class SignalDispatcher implements Dispatcher
 {
     /**
-     * @var TaskProcessor
+     * @var Processor
      */
     private $processor;
 
     /**
-     * @var HandlerRegistry
+     * @var ArgumentsResolver
      */
-    private $handlers;
+    private $resolver;
 
     /**
-     * @param TaskProcessor   $processor
+     * @var callable[]
      */
-    public function __construct(TaskProcessor $processor = null)
+    private $handlers = [];
+
+    /**
+     * @param Processor         $processor
+     * @param ArgumentsResolver $resolver
+     */
+    public function __construct(Processor $processor, ArgumentsResolver $resolver)
     {
-        $this->processor = $processor ?: new TaskProcessor();
-        $this->handlers  = new HandlerRegistry();
+        $this->processor = $processor;
+        $this->resolver  = $resolver;
+    }
+
+    /**
+     * @param ArgumentsResolver $resolver
+     *
+     * @return self
+     */
+    public static function amp(ArgumentsResolver $resolver = null): self
+    {
+        return new self(new Amp\AmpProcessor(), $resolver ?: new Resolver\EmptyResolver());
     }
 
     /**
@@ -41,8 +57,9 @@ final class SignalDispatcher implements Dispatcher
      */
     public function register(string $signal, callable $handler): self
     {
-        $this->handlers->register($signal, $handler);
-        $this->processor->intercept($signal, function (...$arguments) use ($signal) {
+        $this->handlers[$signal] = $handler;
+
+        $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
         });
 
@@ -60,6 +77,21 @@ final class SignalDispatcher implements Dispatcher
             $signal = \get_class($signal);
         }
 
-        return $this->processor->execute($this->handlers->acquire($signal), ...$arguments);
+        $handler   = $this->handlers[$signal] ?? $this->unknown($signal);
+        $arguments = (new Arguments($arguments))->inject($this->resolver->resolve($handler));
+
+        return $this->processor->execute($handler, ...$arguments);
+    }
+
+    /**
+     * @param string $signal
+     *
+     * @return callable
+     */
+    private function unknown(string $signal): callable
+    {
+        return function () use ($signal) {
+            throw new Exception\UnknownSignal($signal);
+        };
     }
 }

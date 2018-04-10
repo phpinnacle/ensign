@@ -15,9 +15,9 @@ use PHPinnacle\Ensign\Arguments;
 class ArgumentsTest extends EnsignTest
 {
     /**
-     * @test
-     *
      * Test that Arguments can be created from array
+     *
+     * @test
      */
     public function create()
     {
@@ -36,9 +36,9 @@ class ArgumentsTest extends EnsignTest
     }
 
     /**
-     * @test
-     *
      * Test that Arguments can be created with no data
+     *
+     * @test
      */
     public function empty()
     {
@@ -49,9 +49,9 @@ class ArgumentsTest extends EnsignTest
     }
 
     /**
-     * @test
-     *
      * Test that Arguments can be injected with others
+     *
+     * @test
      */
     public function inject()
     {
@@ -62,9 +62,9 @@ class ArgumentsTest extends EnsignTest
     }
 
     /**
-     * @test
-     *
      * Test that Arguments can be counted
+     *
+     * @test
      */
     public function count()
     {

@@ -17,9 +17,9 @@ use PHPinnacle\Ensign\Tests\EnsignTest;
 class EmptyResolverTest extends EnsignTest
 {
     /**
-     * @test
-     *
      * Test that Resolver try resolve arguments for callable
+     *
+     * @test
      */
     public function testResolve()
     {

@@ -10,36 +10,25 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign;
+namespace PHPinnacle\Ensign\Amp;
 
 use Amp\LazyPromise;
 use Amp\Coroutine;
+use PHPinnacle\Ensign\Processor;
+use PHPinnacle\Ensign\Task;
 
-final class TaskProcessor implements Processor
+final class AmpProcessor implements Processor
 {
-    /**
-     * @var ArgumentsResolver
-     */
-    private $resolver;
-
     /**
      * @var callable[]
      */
     private $interruptions = [];
 
     /**
-     * @param ArgumentsResolver $resolver
-     */
-    public function __construct(ArgumentsResolver $resolver = null)
-    {
-        $this->resolver = $resolver ?: new Resolver\EmptyResolver();
-    }
-
-    /**
      * @param string   $interrupt
      * @param callable $interrupter
      */
-    public function intercept(string $interrupt, callable $interrupter): void
+    public function interrupt(string $interrupt, callable $interrupter): void
     {
         $this->interruptions[$interrupt] = $interrupter;
     }
@@ -49,48 +38,47 @@ final class TaskProcessor implements Processor
      */
     public function execute(callable $callable, ...$arguments): Task
     {
-        $token     = new TaskToken();
-        $arguments = (new Arguments($arguments))->inject($this->resolver->resolve($callable));
+        $token = new AmpToken();
 
-        return new Task(new LazyPromise(function () use ($callable, $arguments, $token) {
-            return $this->coroutine($callable(...$arguments), $token);
+        return new AmpTask(new LazyPromise(function () use ($callable, $arguments, $token) {
+            return $this->adapt($callable(...$arguments), $token);
         }), $token);
     }
 
     /**
      * @param mixed     $value
-     * @param TaskToken $token
+     * @param AmpToken $token
      *
      * @return mixed
      */
-    private function coroutine($value, TaskToken $token)
+    private function adapt($value, AmpToken $token)
     {
         return $value instanceof \Generator ? new Coroutine($this->recoil($value, $token)) : $value;
     }
 
     /**
      * @param \Generator $generator
-     * @param TaskToken  $token
+     * @param AmpToken  $token
      *
      * @return mixed
      */
-    private function recoil(\Generator $generator, TaskToken $token)
+    private function recoil(\Generator $generator, AmpToken $token)
     {
         while ($generator->valid()) {
             $token->guard();
 
             try {
                 $key   = $generator->key();
-                $value = $this->interrupt($key, $generator->current());
+                $value = $this->intercept($key, $generator->current());
 
-                $generator->send(yield $this->coroutine($value, $token));
+                $generator->send(yield $this->adapt($value, $token));
             } catch (\Exception $error) {
                 /** @scrutinizer ignore-call */
                 $generator->throw($error);
             }
         }
 
-        return $this->coroutine($generator->getReturn(), $token);
+        return $this->adapt($generator->getReturn(), $token);
     }
 
     /**
@@ -99,7 +87,7 @@ final class TaskProcessor implements Processor
      *
      * @return mixed
      */
-    private function interrupt($key, $value)
+    private function intercept($key, $value)
     {
         if (!\is_string($key) && \is_object($value)) {
             $key = \get_class($value);

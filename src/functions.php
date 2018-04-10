@@ -10,7 +10,6 @@
 
 declare(strict_types = 1);
 
-use Amp\Promise;
 use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Dispatcher;
 use PHPinnacle\Ensign\Task;
@@ -22,7 +21,7 @@ final class StaticDispatcher implements Dispatcher
 
     private function __construct()
     {
-        $this->dispatcher = new SignalDispatcher();
+        $this->dispatcher = SignalDispatcher::amp();
     }
 
     public static function instance(): self
@@ -58,9 +57,9 @@ function ensign_signal(string $signal, callable $handler): void
  * @param string    $signal
  * @param mixed  ...$arguments
  *
- * @return Promise
+ * @return Task
  */
-function ensign_dispatch(string $signal, ...$arguments): Promise
+function ensign_dispatch(string $signal, ...$arguments): Task
 {
     return StaticDispatcher::instance()->dispatch($signal, ...$arguments);
 }

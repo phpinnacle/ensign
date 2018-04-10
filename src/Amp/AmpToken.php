@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign;
+namespace PHPinnacle\Ensign\Amp;
 
 use Amp\CancellationTokenSource;
 
-class TaskToken
+final class AmpToken
 {
     /**
      * @var CancellationTokenSource

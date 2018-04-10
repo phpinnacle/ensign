@@ -18,9 +18,9 @@ use PHPinnacle\Ensign\Tests\Stub;
 class ChainResolverTest extends EnsignTest
 {
     /**
-     * @test
-     *
      * Test that Resolver try resolve arguments for callable
+     *
+     * @test
      */
     public function testResolve()
     {

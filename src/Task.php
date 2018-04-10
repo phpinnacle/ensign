@@ -12,44 +12,15 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-use Amp\Promise;
-
-class Task implements Promise
+interface Task
 {
     /**
-     * @var Promise
+     * @param callable $then
      */
-    private $promise;
-
-    /**
-     * @var TaskToken
-     */
-    private $token;
-
-    /**
-     * @param Promise   $promise
-     * @param TaskToken $token
-     */
-    public function __construct(Promise $promise, TaskToken $token)
-    {
-        $this->promise = $promise;
-        $this->token   = $token;
-    }
+    public function then(callable $then): void;
 
     /**
      * @return void
      */
-    public function cancel(): void
-    {
-        $this->token->cancel();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function onResolve(callable $onResolved)
-    {
-        $this->token->guard();
-        $this->promise->onResolve($onResolved);
-    }
+    public function cancel(): void;
 }

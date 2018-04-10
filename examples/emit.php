@@ -1,7 +1,6 @@
 <?php
 
 use Amp\Delayed;
-use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -29,7 +28,7 @@ class SimpleCommand
 }
 
 Amp\Loop::run(function () {
-    $dispatcher = new SignalDispatcher();
+    $dispatcher = SignalDispatcher::amp();
     $dispatcher
         ->register(SimpleCommand::class, function (SimpleCommand $cmd) {
             yield new Delayed($cmd->delay); // Just do some heavy calculations

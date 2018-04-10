@@ -12,7 +12,6 @@ namespace PHPinnacle\Ensign\Tests\Resolver;
 
 use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\HandlerRegistry;
 use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Tests\EnsignTest;
@@ -21,9 +20,9 @@ use Psr\Container\ContainerInterface;
 class ContainerResolverTest extends EnsignTest
 {
     /**
-     * @test
-     *
      * Test that Resolver try resolve arguments for callable
+     *
+     * @test
      */
     public function testResolve()
     {
@@ -34,7 +33,7 @@ class ContainerResolverTest extends EnsignTest
         ;
         $container
             ->method('get', Dispatcher::class)
-            ->willReturn($dispatcher = new SignalDispatcher())
+            ->willReturn($dispatcher = SignalDispatcher::amp())
         ;
 
         $resolver = new Resolver\ContainerResolver($container);
