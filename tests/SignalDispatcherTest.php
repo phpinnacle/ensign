@@ -10,7 +10,7 @@
 
 namespace PHPinnacle\Ensign\Tests;
 
-use PHPinnacle\Ensign\Resolver\ObjectResolver;
+use PHPinnacle\Ensign\Arguments\ObjectArguments;
 use PHPinnacle\Ensign\SignalDispatcher;
 
 class SignalDispatcherTest extends EnsignTest
@@ -52,7 +52,7 @@ class SignalDispatcherTest extends EnsignTest
             $object = new \stdClass();
             $object->id = 1;
 
-            $dispatcher = SignalDispatcher::amp(new ObjectResolver([
+            $dispatcher = SignalDispatcher::amp(new ObjectArguments([
                 \stdClass::class => $object,
             ]));
             $dispatcher

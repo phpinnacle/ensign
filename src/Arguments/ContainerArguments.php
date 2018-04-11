@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Resolver;
+namespace PHPinnacle\Ensign\Arguments;
 
 use Psr\Container\ContainerInterface;
 
-final class ContainerResolver extends ReflectionResolver
+final class ContainerArguments extends ReflectionArguments
 {
     /**
      * @var ContainerInterface

@@ -10,18 +10,17 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Resolver;
+namespace PHPinnacle\Ensign\Arguments;
 
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\ArgumentsResolver;
 
-final class EmptyResolver implements ArgumentsResolver
+final class EmptyArguments implements Arguments
 {
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): Arguments
+    public function resolve(callable $callable): array
     {
-        return Arguments::empty();
+        return [];
     }
 }

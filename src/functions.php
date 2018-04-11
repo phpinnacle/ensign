@@ -26,11 +26,7 @@ final class StaticDispatcher implements Dispatcher
 
     public static function instance(): self
     {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
+        return self::$instance ?: self::$instance = new self();
     }
 
     public function register(string $signal, callable $action): void

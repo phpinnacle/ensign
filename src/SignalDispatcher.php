@@ -20,7 +20,7 @@ final class SignalDispatcher implements Dispatcher
     private $processor;
 
     /**
-     * @var ArgumentsResolver
+     * @var Arguments
      */
     private $resolver;
 
@@ -30,23 +30,23 @@ final class SignalDispatcher implements Dispatcher
     private $handlers = [];
 
     /**
-     * @param Processor         $processor
-     * @param ArgumentsResolver $resolver
+     * @param Processor $processor
+     * @param Arguments $resolver
      */
-    public function __construct(Processor $processor, ArgumentsResolver $resolver)
+    public function __construct(Processor $processor, Arguments $resolver)
     {
         $this->processor = $processor;
         $this->resolver  = $resolver;
     }
 
     /**
-     * @param ArgumentsResolver $resolver
+     * @param Arguments $resolver
      *
      * @return self
      */
-    public static function amp(ArgumentsResolver $resolver = null): self
+    public static function amp(Arguments $resolver = null): self
     {
-        return new self(new Amp\AmpProcessor(), $resolver ?: new Resolver\EmptyResolver());
+        return new self(new Amp\AmpProcessor(), $resolver ?: new Arguments\EmptyArguments());
     }
 
     /**
@@ -77,21 +77,38 @@ final class SignalDispatcher implements Dispatcher
             $signal = \get_class($signal);
         }
 
-        $handler   = $this->handlers[$signal] ?? $this->unknown($signal);
-        $arguments = (new Arguments($arguments))->inject($this->resolver->resolve($handler));
+        $handler   = $this->handlers[$signal] ?? $this->error(new Exception\UnknownSignal($signal));
+        $arguments = $this->resolve($handler, $arguments);
 
         return $this->processor->execute($handler, ...$arguments);
     }
 
     /**
-     * @param string $signal
+     * @param callable $handler
+     * @param array    $arguments
+     *
+     * @return array
+     */
+    private function resolve(callable $handler, array $arguments): array
+    {
+        $resolved = $this->resolver->resolve($handler);
+
+        foreach ($resolved as $position => $argument) {
+            \array_splice($arguments, $position, 0, [$argument]);
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * @param \Exception $exception
      *
      * @return callable
      */
-    private function unknown(string $signal): callable
+    private function error(\Exception $exception): callable
     {
-        return function () use ($signal) {
-            throw new Exception\UnknownSignal($signal);
+        return function () use ($exception) {
+            throw $exception;
         };
     }
 }

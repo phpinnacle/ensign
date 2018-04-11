@@ -8,16 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Resolver;
+namespace PHPinnacle\Ensign\Tests\Arguments;
 
-use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Resolver;
+use PHPinnacle\Ensign\Arguments;
 use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use Psr\Container\ContainerInterface;
 
-class ContainerResolverTest extends EnsignTest
+class ContainerArgumentsTest extends EnsignTest
 {
     /**
      * Test that Resolver try resolve arguments for callable
@@ -36,13 +35,13 @@ class ContainerResolverTest extends EnsignTest
             ->willReturn($dispatcher = SignalDispatcher::amp())
         ;
 
-        $resolver = new Resolver\ContainerResolver($container);
+        $resolver = new Arguments\ContainerArguments($container);
 
         $arguments = $resolver->resolve(function (Dispatcher $dispatcher, int $value) {
             return [$dispatcher, $value];
         });
 
-        self::assertInstanceOf(Arguments::class, $arguments);
-        self::assertEquals([$dispatcher], iterator_to_array($arguments));
+        self::assertArray($arguments);
+        self::assertEquals([$dispatcher], $arguments);
     }
 }

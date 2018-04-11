@@ -8,13 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Resolver;
+namespace PHPinnacle\Ensign\Tests\Arguments;
 
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
-class ObjectResolverTest extends EnsignTest
+class ObjectArgumentsTest extends EnsignTest
 {
     /**
      * Test that Resolver try resolve arguments for callable
@@ -26,7 +25,7 @@ class ObjectResolverTest extends EnsignTest
         $object = new \stdClass;
         $object->data = 42;
 
-        $resolver = new Resolver\ObjectResolver([
+        $resolver = new Arguments\ObjectArguments([
             \stdClass::class => $object
         ]);
 
@@ -34,7 +33,7 @@ class ObjectResolverTest extends EnsignTest
             return [$object, $value];
         });
 
-        self::assertInstanceOf(Arguments::class, $arguments);
-        self::assertEquals([$object], iterator_to_array($arguments));
+        self::assertArray($arguments);
+        self::assertEquals([$object], $arguments);
     }
 }

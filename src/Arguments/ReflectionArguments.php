@@ -10,17 +10,16 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Resolver;
+namespace PHPinnacle\Ensign\Arguments;
 
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\ArgumentsResolver;
 
-abstract class ReflectionResolver implements ArgumentsResolver
+abstract class ReflectionArguments implements Arguments
 {
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): Arguments
+    public function resolve(callable $callable): array
     {
         $arguments  = [];
 
@@ -41,7 +40,7 @@ abstract class ReflectionResolver implements ArgumentsResolver
             }
         }
 
-        return new Arguments($arguments);
+        return $arguments;
     }
 
     /**

@@ -10,22 +10,21 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Resolver;
+namespace PHPinnacle\Ensign\Arguments;
 
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\ArgumentsResolver;
 
-final class ChainResolver implements ArgumentsResolver
+final class MultiArguments implements Arguments
 {
     /**
-     * @var ArgumentsResolver[]
+     * @var Arguments[]
      */
     private $resolvers;
 
     /**
-     * @param ArgumentsResolver ...$resolvers
+     * @param Arguments ...$resolvers
      */
-    public function __construct(ArgumentsResolver ...$resolvers)
+    public function __construct(Arguments ...$resolvers)
     {
         $this->resolvers = $resolvers;
     }
@@ -33,13 +32,12 @@ final class ChainResolver implements ArgumentsResolver
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): Arguments
+    public function resolve(callable $callable): array
     {
-        $arguments = Arguments::empty();
+        $arguments = [];
 
         foreach ($this->resolvers as $resolver) {
-            $resolved  = $resolver->resolve($callable);
-            $arguments = $arguments->merge($resolved);
+            $arguments = \array_replace($arguments, $resolver->resolve($callable));
         }
 
         return $arguments;

@@ -8,13 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Resolver;
+namespace PHPinnacle\Ensign\Tests\Arguments;
 
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
-class EmptyResolverTest extends EnsignTest
+class EmptyArgumentsTest extends EnsignTest
 {
     /**
      * Test that Resolver try resolve arguments for callable
@@ -23,11 +22,11 @@ class EmptyResolverTest extends EnsignTest
      */
     public function testResolve()
     {
-        $resolver = new Resolver\EmptyResolver();
+        $resolver = new Arguments\EmptyArguments();
 
         $arguments = $resolver->resolve(function (string $string, int $int) {});
 
-        self::assertInstanceOf(Arguments::class, $arguments);
+        self::assertArray($arguments);
         self::assertCount(0, $arguments);
     }
 }
