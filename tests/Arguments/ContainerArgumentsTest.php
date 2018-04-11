@@ -12,7 +12,6 @@ namespace PHPinnacle\Ensign\Tests\Arguments;
 
 use PHPinnacle\Ensign\Dispatcher;
 use PHPinnacle\Ensign\Arguments;
-use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use Psr\Container\ContainerInterface;
 
@@ -32,7 +31,7 @@ class ContainerArgumentsTest extends EnsignTest
         ;
         $container
             ->method('get', Dispatcher::class)
-            ->willReturn($dispatcher = SignalDispatcher::amp())
+            ->willReturn($dispatcher = Dispatcher::amp())
         ;
 
         $resolver = new Arguments\ContainerArguments($container);

@@ -1,6 +1,6 @@
 <?php
 
-use PHPinnacle\Ensign\SignalDispatcher;
+use PHPinnacle\Ensign\Dispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -23,7 +23,7 @@ class Stop
 }
 
 Amp\Loop::run(function () {
-    $dispatcher = SignalDispatcher::amp();
+    $dispatcher = Dispatcher::amp();
     $dispatcher
         ->register(Ping::class, function (Ping $cmd) {
             if ($cmd->times > 0) {

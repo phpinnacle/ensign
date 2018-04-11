@@ -10,34 +10,14 @@
 
 declare(strict_types = 1);
 
-use PHPinnacle\Ensign\SignalDispatcher;
 use PHPinnacle\Ensign\Dispatcher;
 use PHPinnacle\Ensign\Task;
 
-final class StaticDispatcher implements Dispatcher
+function __ensign_dispatcher(): Dispatcher
 {
-    private static $instance;
-    private $dispatcher;
+    static $dispatcher;
 
-    private function __construct()
-    {
-        $this->dispatcher = SignalDispatcher::amp();
-    }
-
-    public static function instance(): self
-    {
-        return self::$instance ?: self::$instance = new self();
-    }
-
-    public function register(string $signal, callable $action): void
-    {
-        $this->dispatcher->register($signal, $action);
-    }
-
-    public function dispatch($signal, ...$arguments): Task
-    {
-        return $this->dispatcher->dispatch($signal, ...$arguments);
-    }
+    return $dispatcher ?: $dispatcher = Dispatcher::amp();
 }
 
 /**
@@ -46,7 +26,7 @@ final class StaticDispatcher implements Dispatcher
  */
 function ensign_signal(string $signal, callable $handler): void
 {
-    StaticDispatcher::instance()->register($signal, $handler);
+    __ensign_dispatcher()->register($signal, $handler);
 }
 
 /**
@@ -57,7 +37,7 @@ function ensign_signal(string $signal, callable $handler): void
  */
 function ensign_dispatch(string $signal, ...$arguments): Task
 {
-    return StaticDispatcher::instance()->dispatch($signal, ...$arguments);
+    return __ensign_dispatcher()->dispatch($signal, ...$arguments);
 }
 
 /**
@@ -68,7 +48,7 @@ function ensign_dispatch(string $signal, ...$arguments): Task
  */
 function ensign_pcntl_signals(array $signals, Dispatcher $dispatcher = null): void
 {
-    $dispatcher = $dispatcher ?: StaticDispatcher::instance();
+    $dispatcher = $dispatcher ?: __ensign_dispatcher();
 
     foreach ($signals as $signal) {
         // OS signal support check
