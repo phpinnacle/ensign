@@ -23,7 +23,7 @@ class Stop
 }
 
 Amp\Loop::run(function () {
-    $dispatcher = Dispatcher::amp();
+    $dispatcher = Dispatcher::instance();
     $dispatcher
         ->register(Ping::class, function (Ping $cmd) {
             if ($cmd->times > 0) {

@@ -6,7 +6,7 @@ use PHPinnacle\Ensign\Dispatcher;
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = Dispatcher::amp();
+    $dispatcher = Dispatcher::instance();
     $dispatcher
         ->register('emit', function (string $string, int $num, int $delay = 100) {
             for ($i = 0; $i < $num; $i++) {

@@ -10,11 +10,11 @@
 
 namespace PHPinnacle\Ensign\Tests\Amp;
 
+use PHPinnacle\Ensign\Processor;
 use PHPinnacle\Ensign\Task;
-use PHPinnacle\Ensign\Amp\AmpProcessor;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
-class AmpProcessorTest extends EnsignTest
+class ProcessorTest extends EnsignTest
 {
     /**
      * Test that Processor can execute callable
@@ -24,7 +24,7 @@ class AmpProcessorTest extends EnsignTest
     public function execute()
     {
         $this->loop(function () {
-            $processor = new AmpProcessor();
+            $processor = new Processor();
 
             $task = $processor->execute(function ($value) {
                 return $value * 2;
