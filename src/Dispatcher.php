@@ -44,9 +44,9 @@ final class Dispatcher
      *
      * @return self
      */
-    public static function amp(Arguments $resolver = null): self
+    public static function instance(Arguments $resolver = null): self
     {
-        return new self(new Amp\AmpProcessor(), $resolver ?: new Arguments\EmptyArguments());
+        return new self(new Processor(), $resolver ?: new Arguments\EmptyArguments());
     }
 
     /**

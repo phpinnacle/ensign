@@ -28,7 +28,7 @@ class SimpleCommand
 }
 
 Amp\Loop::run(function () {
-    $dispatcher = Dispatcher::amp();
+    $dispatcher = Dispatcher::instance();
     $dispatcher
         ->register(SimpleCommand::class, function (SimpleCommand $cmd) {
             yield new Delayed($cmd->delay); // Just do some heavy calculations

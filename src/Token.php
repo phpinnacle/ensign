@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Amp;
+namespace PHPinnacle\Ensign;
 
 use Amp\CancellationTokenSource;
 
-final class AmpToken
+final class Token
 {
     /**
      * @var CancellationTokenSource
@@ -27,6 +27,16 @@ final class AmpToken
     private $token;
 
     /**
+     * @var int
+     */
+    private $task;
+
+    /**
+     * @var string
+     */
+    private $reason;
+
+    /**
      * TaskToken constructor.
      */
     public function __construct()
@@ -36,10 +46,15 @@ final class AmpToken
     }
 
     /**
+     * @param int    $task
+     * @param string $reason
      * @return void
      */
-    public function cancel(): void
+    public function cancel(int $task, string $reason): void
     {
+        $this->task   = $task;
+        $this->reason = $reason;
+
         $this->source->cancel();
     }
 
@@ -48,6 +63,8 @@ final class AmpToken
      */
     public function guard(): void
     {
-        $this->token->throwIfRequested();
+        if ($this->token->isRequested()) {
+            throw new Exception\TaskCanceled($this->task, $this->reason);
+        };
     }
 }

@@ -12,15 +12,91 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-interface Task
+use Amp\Deferred;
+use Amp\Loop;
+use Amp\Promise;
+
+final class Task implements Promise
 {
     /**
-     * @param callable $then
+     * @var int
      */
-    public function then(callable $then): void;
+    private $id;
 
     /**
-     * @return void
+     * @var Promise
      */
-    public function cancel(): void;
+    private $promise;
+
+    /**
+     * @var Token
+     */
+    private $token;
+
+    /**
+     * @param int     $id
+     * @param Promise $promise
+     * @param Token   $token
+     */
+    public function __construct(int $id, Promise $promise, Token $token)
+    {
+        $this->id      = $id;
+        $this->promise = $promise;
+        $this->token   = $token;
+    }
+
+    /**
+     * @return int
+     */
+    public function id(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $reason
+     *
+     * @return Task
+     */
+    public function cancel(string $reason = ''): self
+    {
+        $this->token->cancel($this->id, $reason);
+
+        return $this;
+    }
+
+    /**
+     * @param int $timeout
+     *
+     * @return self
+     */
+    public function timeout(int $timeout): self
+    {
+        $deferred = new Deferred;
+
+        $watcher = Loop::delay($timeout, function () use ($deferred) {
+            $deferred->fail(new Exception\TaskTimeout($this->id));
+        });
+        Loop::unreference($watcher);
+
+        $promise = $this->promise;
+        $promise->onResolve(function () use ($deferred, $watcher) {
+            Loop::cancel($watcher);
+
+            $deferred->resolve($this->promise);
+        });
+
+        $this->promise = $deferred->promise();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onResolve(callable $onResolved)
+    {
+        $this->token->guard();
+        $this->promise->onResolve($onResolved);
+    }
 }

@@ -11,11 +11,11 @@
 namespace PHPinnacle\Ensign\Tests\Amp;
 
 use Amp\Success;
-use PHPinnacle\Ensign\Amp\AmpTask;
-use PHPinnacle\Ensign\Amp\AmpToken;
+use PHPinnacle\Ensign\Task;
 use PHPinnacle\Ensign\Tests\EnsignTest;
+use PHPinnacle\Ensign\Token;
 
-class AmpTaskTest extends EnsignTest
+class TaskTest extends EnsignTest
 {
     /**
      * Test that Task can be canceled
@@ -26,25 +26,8 @@ class AmpTaskTest extends EnsignTest
     public function cancel()
     {
         self::loop(function () {
-            $task = new AmpTask(new Success(), new AmpToken());
+            $task = new Task(new Success(), new Token());
             $task->cancel();
-
-            yield $task;
-        });
-    }
-
-    /**
-     * Test that Task are thenable
-     *
-     * @test
-     */
-    public function then()
-    {
-        self::loop(function () {
-            $task = new AmpTask(new Success(1), new AmpToken());
-            $task->then(function (\Exception $error = null, $value = null) {
-                $this->assertEquals(1, $value);
-            });
 
             yield $task;
         });
