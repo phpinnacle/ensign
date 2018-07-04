@@ -10,7 +10,7 @@
 
 namespace PHPinnacle\Ensign\Tests;
 
-use PHPinnacle\Ensign\Arguments;
+use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Dispatcher;
 
 class DispatcherTest extends EnsignTest
@@ -23,7 +23,7 @@ class DispatcherTest extends EnsignTest
     public function dispatchSignals()
     {
         self::loop(function () {
-            $dispatcher = Dispatcher::amp();
+            $dispatcher = Dispatcher::instance();
             $dispatcher
                 ->register('upper', function ($text) {
                     return strtoupper($text);
@@ -52,7 +52,7 @@ class DispatcherTest extends EnsignTest
             $object = new \stdClass();
             $object->id = 1;
 
-            $dispatcher = Dispatcher::amp(new Arguments\ObjectArguments([
+            $dispatcher = Dispatcher::instance(new Resolver\ObjectResolver([
                 \stdClass::class => $object,
             ]));
             $dispatcher
@@ -74,7 +74,7 @@ class DispatcherTest extends EnsignTest
     public function dispatchObject()
     {
         self::loop(function () {
-            $dispatcher = Dispatcher::amp();
+            $dispatcher = Dispatcher::instance();
             $dispatcher
                 ->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
                     return strtoupper($event->data);
@@ -94,7 +94,7 @@ class DispatcherTest extends EnsignTest
     public function dispatchSignalFromCoroutine()
     {
         self::loop(function () {
-            $dispatcher = Dispatcher::amp();
+            $dispatcher = Dispatcher::instance();
             $dispatcher
                 ->register('coroutine', function ($count) {
                     try {
@@ -130,7 +130,7 @@ class DispatcherTest extends EnsignTest
     public function dispatchUnknownSignal()
     {
         self::loop(function () {
-            $dispatcher = Dispatcher::amp();
+            $dispatcher = Dispatcher::instance();
 
             self::assertTask($failure = $dispatcher->dispatch('unknown'));
 
@@ -147,7 +147,7 @@ class DispatcherTest extends EnsignTest
     public function invalidYieldValue()
     {
         self::loop(function () {
-            $dispatcher = Dispatcher::amp();
+            $dispatcher = Dispatcher::instance();
             $dispatcher
                 ->register('invalid', function () {
                     yield 'test';

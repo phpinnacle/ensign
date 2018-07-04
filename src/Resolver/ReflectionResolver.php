@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Arguments;
+namespace PHPinnacle\Ensign\Resolver;
 
-use PHPinnacle\Ensign\Arguments;
+use PHPinnacle\Ensign\Resolver;
 
-abstract class ReflectionArguments implements Arguments
+abstract class ReflectionResolver implements Resolver
 {
     /**
      * {@inheritdoc}

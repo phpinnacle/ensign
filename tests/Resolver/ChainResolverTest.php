@@ -10,11 +10,11 @@
 
 namespace PHPinnacle\Ensign\Tests\Arguments;
 
-use PHPinnacle\Ensign\Arguments;
+use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use PHPinnacle\Ensign\Tests\Stub;
 
-class MultiArgumentsTest extends EnsignTest
+class ChainResolverTest extends EnsignTest
 {
     /**
      * Test that Resolver try resolve arguments for callable
@@ -29,11 +29,11 @@ class MultiArgumentsTest extends EnsignTest
         $event = new Stub\SimpleEvent();
         $event->data = 'test';
 
-        $resolver = new Arguments\MultiArguments(
-            new Arguments\ObjectArguments([
+        $resolver = new Resolver\ChainResolver(
+            new Resolver\ObjectResolver([
                 \stdClass::class => $object,
             ]),
-            new Arguments\ObjectArguments([
+            new Resolver\ObjectResolver([
                 Stub\SimpleEvent::class => $event,
             ])
         );

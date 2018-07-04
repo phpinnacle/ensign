@@ -10,10 +10,10 @@
 
 namespace PHPinnacle\Ensign\Tests\Arguments;
 
-use PHPinnacle\Ensign\Arguments;
+use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
-class EmptyArgumentsTest extends EnsignTest
+class ObjectResolverTest extends EnsignTest
 {
     /**
      * Test that Resolver try resolve arguments for callable
@@ -22,11 +22,18 @@ class EmptyArgumentsTest extends EnsignTest
      */
     public function testResolve()
     {
-        $resolver = new Arguments\EmptyArguments();
+        $object = new \stdClass;
+        $object->data = 42;
 
-        $arguments = $resolver->resolve(function (string $string, int $int) {});
+        $resolver = new Resolver\ObjectResolver([
+            \stdClass::class => $object
+        ]);
+
+        $arguments = $resolver->resolve(function (\stdClass $object, int $value) {
+            return [$object, $value];
+        });
 
         self::assertArray($arguments);
-        self::assertCount(0, $arguments);
+        self::assertEquals([$object], $arguments);
     }
 }

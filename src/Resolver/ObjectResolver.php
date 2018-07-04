@@ -10,9 +10,9 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Arguments;
+namespace PHPinnacle\Ensign\Resolver;
 
-final class ObjectArguments extends ReflectionArguments
+final class ObjectResolver extends ReflectionResolver
 {
     /**
      * @var object[]

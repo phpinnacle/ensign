@@ -10,21 +10,21 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Arguments;
+namespace PHPinnacle\Ensign\Resolver;
 
-use PHPinnacle\Ensign\Arguments;
+use PHPinnacle\Ensign\Resolver;
 
-final class MultiArguments implements Arguments
+final class ChainResolver implements Resolver
 {
     /**
-     * @var Arguments[]
+     * @var Resolver[]
      */
     private $resolvers;
 
     /**
-     * @param Arguments ...$resolvers
+     * @param Resolver[] ...$resolvers
      */
-    public function __construct(Arguments ...$resolvers)
+    public function __construct(Resolver ...$resolvers)
     {
         $this->resolvers = $resolvers;
     }

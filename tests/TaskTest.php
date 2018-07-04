@@ -21,12 +21,12 @@ class TaskTest extends EnsignTest
      * Test that Task can be canceled
      *
      * @test
-     * @expectedException \Amp\CancelledException
+     * @expectedException \PHPinnacle\Ensign\Exception\TaskCanceled
      */
     public function cancel()
     {
         self::loop(function () {
-            $task = new Task(new Success(), new Token());
+            $task = new Task(1, new Success(), new Token());
             $task->cancel();
 
             yield $task;

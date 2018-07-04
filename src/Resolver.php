@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-interface Arguments
+interface Resolver
 {
     /**
      * @param callable $callable

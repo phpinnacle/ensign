@@ -20,7 +20,7 @@ final class Dispatcher
     private $processor;
 
     /**
-     * @var Arguments
+     * @var Resolver
      */
     private $resolver;
 
@@ -31,22 +31,22 @@ final class Dispatcher
 
     /**
      * @param Processor $processor
-     * @param Arguments $resolver
+     * @param Resolver $resolver
      */
-    public function __construct(Processor $processor, Arguments $resolver)
+    public function __construct(Processor $processor, Resolver $resolver)
     {
         $this->processor = $processor;
         $this->resolver  = $resolver;
     }
 
     /**
-     * @param Arguments $resolver
+     * @param Resolver $resolver
      *
      * @return self
      */
-    public static function instance(Arguments $resolver = null): self
+    public static function instance(Resolver $resolver = null): self
     {
-        return new self(new Processor(), $resolver ?: new Arguments\EmptyArguments());
+        return new self(new Processor(), $resolver ?: new Resolver\EmptyResolver());
     }
 
     /**
