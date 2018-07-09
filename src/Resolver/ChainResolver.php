@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 
 final class ChainResolver implements Resolver
@@ -32,12 +33,12 @@ final class ChainResolver implements Resolver
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): array
+    public function resolve(Handler $handler): array
     {
         $arguments = [];
 
         foreach ($this->resolvers as $resolver) {
-            $arguments = \array_replace($arguments, $resolver->resolve($callable));
+            $arguments = \array_replace($arguments, $resolver->resolve($handler));
         }
 
         return $arguments;

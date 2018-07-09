@@ -10,6 +10,7 @@
 
 namespace PHPinnacle\Ensign\Tests\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
@@ -22,9 +23,9 @@ class EmptyResolverTest extends EnsignTest
      */
     public function testResolve()
     {
-        $resolver = new Resolver\EmptyResolver();
-
-        $arguments = $resolver->resolve(function (string $string, int $int) {});
+        $resolver  = new Resolver\EmptyResolver();
+        $closure   = function (string $string, int $int) {};
+        $arguments = $resolver->resolve(Handler::recognize($closure));
 
         self::assertArray($arguments);
         self::assertCount(0, $arguments);

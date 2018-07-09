@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 
 final class EmptyResolver implements Resolver
@@ -19,7 +20,7 @@ final class EmptyResolver implements Resolver
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): array
+    public function resolve(Handler $handler): array
     {
         return [];
     }

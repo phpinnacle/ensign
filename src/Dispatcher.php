@@ -57,7 +57,7 @@ final class Dispatcher
      */
     public function register(string $signal, callable $handler): self
     {
-        $this->handlers[$signal] = $handler;
+        $this->handlers[$signal] = $handler instanceof Handler ? $handler : Handler::recognize($handler);
 
         $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
@@ -77,7 +77,7 @@ final class Dispatcher
             $signal = \get_class($signal);
         }
 
-        $handler   = $this->handlers[$signal] ?? $this->error(new Exception\UnknownSignal($signal));
+        $handler   = $this->handlers[$signal] ?? Handler::error(new Exception\UnknownSignal($signal));
         $arguments = $this->resolve($handler, $arguments);
 
         return $this->processor->execute($handler, ...$arguments);
@@ -98,17 +98,5 @@ final class Dispatcher
         }
 
         return $arguments;
-    }
-
-    /**
-     * @param \Exception $exception
-     *
-     * @return callable
-     */
-    private function error(\Exception $exception): callable
-    {
-        return function () use ($exception) {
-            throw $exception;
-        };
     }
 }

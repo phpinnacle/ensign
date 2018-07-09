@@ -8,8 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Arguments;
+namespace PHPinnacle\Ensign\Tests\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
@@ -29,9 +30,11 @@ class ObjectResolverTest extends EnsignTest
             \stdClass::class => $object
         ]);
 
-        $arguments = $resolver->resolve(function (\stdClass $object, int $value) {
+        $closure = function (\stdClass $object, int $value) {
             return [$object, $value];
-        });
+        };
+
+        $arguments = $resolver->resolve(Handler::recognize($closure));
 
         self::assertArray($arguments);
         self::assertEquals([$object], $arguments);

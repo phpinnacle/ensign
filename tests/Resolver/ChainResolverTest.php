@@ -8,8 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Arguments;
+namespace PHPinnacle\Ensign\Tests\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use PHPinnacle\Ensign\Tests\Stub;
@@ -38,7 +39,8 @@ class ChainResolverTest extends EnsignTest
             ])
         );
 
-        $arguments = $resolver->resolve(function (Stub\SimpleEvent $event, \stdClass $object, int $int) {});
+        $closure   = function (Stub\SimpleEvent $event, \stdClass $object, int $int) {};
+        $arguments = $resolver->resolve(Handler::recognize($closure));
 
         self::assertArray($arguments);
         self::assertCount(2, $arguments);

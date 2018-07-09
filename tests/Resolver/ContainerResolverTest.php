@@ -11,6 +11,7 @@
 namespace PHPinnacle\Ensign\Tests\Resolver;
 
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use Psr\Container\ContainerInterface;
@@ -35,10 +36,11 @@ class ContainerResolverTest extends EnsignTest
         ;
 
         $resolver = new Resolver\ContainerResolver($container);
-
-        $arguments = $resolver->resolve(function (Dispatcher $dispatcher, int $value) {
+        $closure  = function (Dispatcher $dispatcher, int $value) {
             return [$dispatcher, $value];
-        });
+        };
+
+        $arguments = $resolver->resolve(Handler::recognize($closure));
 
         self::assertArray($arguments);
         self::assertEquals([$dispatcher], $arguments);

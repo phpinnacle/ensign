@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Resolver;
 
+use PHPinnacle\Ensign\Handler;
 use PHPinnacle\Ensign\Resolver;
 
 abstract class ReflectionResolver implements Resolver
@@ -19,15 +20,11 @@ abstract class ReflectionResolver implements Resolver
     /**
      * {@inheritdoc}
      */
-    public function resolve(callable $callable): array
+    public function resolve(Handler $handler): array
     {
-        $arguments  = [];
+        $arguments = [];
 
-        $closure    = \Closure::fromCallable($callable);
-        $reflection = new \ReflectionMethod($closure, '__invoke');
-        $parameters = $reflection->getParameters();
-
-        foreach ($parameters as $parameter) {
+        foreach ($handler->parameters() as $parameter) {
             if (!$class = $parameter->getClass()) {
                 continue;
             }

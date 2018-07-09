@@ -14,9 +14,9 @@ namespace PHPinnacle\Ensign;
 interface Resolver
 {
     /**
-     * @param callable $callable
+     * @param Handler $handler
      *
      * @return array
      */
-    public function resolve(callable $callable): array;
+    public function resolve(Handler $handler): array;
 }

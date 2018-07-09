@@ -14,7 +14,6 @@ namespace PHPinnacle\Ensign;
 
 use Amp\LazyPromise;
 use Amp\Coroutine;
-use Amp\Promise;
 
 final class Processor
 {
@@ -92,15 +91,17 @@ final class Processor
      */
     private function intercept($key, $value)
     {
-        if (!\is_string($key) && \is_object($value)) {
-            $key = \get_class($value);
+        $interrupt = \is_string($key) ? $key : $value;
+
+        if (\is_object($interrupt)) {
+            $interrupt = \get_class($interrupt);
         }
 
-        if (!isset($this->interruptions[$key])) {
+        if (!\is_string($interrupt) || !isset($this->interruptions[$interrupt])) {
             return $value;
         }
 
-        $interceptor = $this->interruptions[$key];
+        $interceptor = $this->interruptions[$interrupt];
 
         $value = \is_array($value) ? $value : [$value];
 

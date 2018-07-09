@@ -27,7 +27,7 @@ final class TaskCanceled extends EnsignException
     {
         $this->task = $task;
 
-        parent::__construct($reason ?: 'Task %d was cancelled');
+        parent::__construct($reason ?: sprintf('Task %d was cancelled', $task));
     }
 
     /**
