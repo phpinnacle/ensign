@@ -10,6 +10,8 @@
 
 namespace PHPinnacle\Ensign\Tests\Amp;
 
+use Amp\Deferred;
+use Amp\Delayed;
 use Amp\Success;
 use PHPinnacle\Ensign\Task;
 use PHPinnacle\Ensign\Tests\EnsignTest;
@@ -30,6 +32,37 @@ class TaskTest extends EnsignTest
             $task->cancel();
 
             yield $task;
+        });
+    }
+
+    /**
+     * Test that Task throw exception when timeout reached
+     *
+     * @test
+     * @expectedException \PHPinnacle\Ensign\Exception\TaskTimeout
+     */
+    public function timeout()
+    {
+        self::loop(function () {
+            $task = new Task(1, new Delayed(100, true), new Token());
+            $task->timeout(10);
+
+            yield $task;
+        });
+    }
+
+    /**
+     * Test that Task can has timeout
+     *
+     * @test
+     */
+    public function fast()
+    {
+        self::loop(function () {
+            $task = new Task(1, new Success(true), new Token());
+            $task->timeout(100);
+
+            self::assertTrue(yield $task);
         });
     }
 }

@@ -10,6 +10,7 @@
 
 namespace PHPinnacle\Ensign\Tests\Amp;
 
+use Amp\Delayed;
 use PHPinnacle\Ensign\Processor;
 use PHPinnacle\Ensign\Task;
 use PHPinnacle\Ensign\Tests\EnsignTest;
@@ -31,6 +32,29 @@ class ProcessorTest extends EnsignTest
             }, 21);
 
             self::assertInstanceOf(Task::class, $task);
+            self::assertEquals(1, $task->id());
+            self::assertEquals(42, yield $task);
+        });
+    }
+
+    /**
+     * Test that Processor can execute coroutine
+     *
+     * @test
+     */
+    public function coroutine()
+    {
+        $this->loop(function () {
+            $processor = new Processor();
+
+            $task = $processor->execute(function ($value) {
+                yield new Delayed(10);
+
+                return $value * 2;
+            }, 21);
+
+            self::assertInstanceOf(Task::class, $task);
+            self::assertEquals(1, $task->id());
             self::assertEquals(42, yield $task);
         });
     }

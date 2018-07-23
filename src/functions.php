@@ -56,7 +56,7 @@ function ensign_pcntl_signals(array $signals, Dispatcher $dispatcher = null): vo
             continue;
         }
 
-        $handler = function (string $watcherId, int $sigNo, $sigInfo = null) use ($dispatcher, $signal) {
+        $handler = static function (string $watcherId, int $sigNo, $sigInfo = null) use ($dispatcher, $signal) {
             yield $dispatcher->dispatch($signal, $sigNo, $sigInfo, $watcherId);
         };
 
