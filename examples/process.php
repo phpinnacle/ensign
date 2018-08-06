@@ -6,7 +6,7 @@ use PHPinnacle\Ensign\Dispatcher;
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = Dispatcher::instance();
+    $dispatcher = new Dispatcher();
     $dispatcher
         ->register('spawn', function (callable $process) {
             static $pid = 1;

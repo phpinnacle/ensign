@@ -15,10 +15,10 @@ namespace PHPinnacle\Ensign\Exception;
 final class TaskTimeout extends EnsignException
 {
     /**
-     * @param int $task
+     * @param string $id
      */
-    public function __construct(int $task)
+    public function __construct(string $id)
     {
-        parent::__construct(sprintf('Task %d timed out.', $task));
+        parent::__construct(sprintf('Task "%s" timed out.', $id));
     }
 }

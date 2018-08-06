@@ -17,11 +17,12 @@
     ],
     "require": {
         "php": "^7.1",
-        "amphp/amp": "^2.0"
+        "amphp/amp": "^2.0",
+        "phpinnacle/identity": "^0.1.0"
     },
     "require-dev": {
+        "phpunit/phpunit": "^6.0",
         "psr/container": "^1.0",
-        "phpunit/phpunit" : "^6.0",
         "squizlabs/php_codesniffer": "^2.3"
     },
     "autoload": {

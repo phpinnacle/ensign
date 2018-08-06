@@ -15,11 +15,11 @@ namespace PHPinnacle\Ensign\Exception;
 final class TaskCanceled extends EnsignException
 {
     /**
-     * @param int    $task
+     * @param string $id
      * @param string $reason
      */
-    public function __construct(int $task, string $reason)
+    public function __construct(string $id, string $reason = null)
     {
-        parent::__construct($reason ?: sprintf('Task %d was cancelled', $task));
+        parent::__construct($reason ?: sprintf('Task "%s" was cancelled.', $id));
     }
 }

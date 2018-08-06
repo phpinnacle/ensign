@@ -20,33 +20,16 @@ final class Dispatcher
     private $processor;
 
     /**
-     * @var Resolver
-     */
-    private $resolver;
-
-    /**
      * @var callable[]
      */
     private $handlers = [];
 
     /**
      * @param Processor $processor
-     * @param Resolver $resolver
      */
-    public function __construct(Processor $processor, Resolver $resolver)
+    public function __construct(Processor $processor = null)
     {
-        $this->processor = $processor;
-        $this->resolver  = $resolver;
-    }
-
-    /**
-     * @param Resolver $resolver
-     *
-     * @return self
-     */
-    public static function instance(Resolver $resolver = null): self
-    {
-        return new self(new Processor(), $resolver ?: new Resolver\EmptyResolver());
+        $this->processor = $processor ?: new Processor();
     }
 
     /**
@@ -57,7 +40,7 @@ final class Dispatcher
      */
     public function register(string $signal, callable $handler): self
     {
-        $this->handlers[$signal] = $handler instanceof Handler ? $handler : Handler::recognize($handler);
+        $this->handlers[$signal] = $handler;
 
         $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
@@ -77,26 +60,10 @@ final class Dispatcher
             $signal = \get_class($signal);
         }
 
-        $handler   = $this->handlers[$signal] ?? Handler::error(new Exception\UnknownSignal($signal));
-        $arguments = $this->resolve($handler, $arguments);
+        $handler = $this->handlers[$signal] ?? function () use ($signal) {
+            throw new Exception\UnknownSignal($signal);
+        };
 
-        return $this->processor->execute($handler, ...$arguments);
-    }
-
-    /**
-     * @param callable $handler
-     * @param array    $arguments
-     *
-     * @return array
-     */
-    private function resolve(callable $handler, array $arguments): array
-    {
-        $resolved = $this->resolver->resolve($handler);
-
-        foreach ($resolved as $position => $argument) {
-            \array_splice($arguments, $position, 0, [$argument]);
-        }
-
-        return $arguments;
+        return $this->processor->execute($handler, $arguments);
     }
 }

@@ -14,6 +14,7 @@ namespace PHPinnacle\Ensign;
 
 use Amp\LazyPromise;
 use Amp\Coroutine;
+use PHPinnacle\Identity\UUID;
 
 final class Processor
 {
@@ -23,28 +24,28 @@ final class Processor
     private $interruptions = [];
 
     /**
-     * @var int
-     */
-    private $tasks = 0;
-
-    /**
      * @param string   $interrupt
-     * @param callable $interrupter
+     * @param callable $handler
+     *
+     * @return self
      */
-    public function interrupt(string $interrupt, callable $interrupter): void
+    public function interrupt(string $interrupt, callable $handler): self
     {
-        $this->interruptions[$interrupt] = $interrupter;
+        $this->interruptions[$interrupt] = $handler;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(callable $callable, ...$arguments): Task
+    public function execute(callable $handler, array $arguments): Task
     {
-        $token = new Token();
+        $id    = UUID::random();
+        $token = new Token($id);
 
-        return new Task(++$this->tasks, new LazyPromise(function () use ($callable, $arguments, $token) {
-            return $this->adapt($callable(...$arguments), $token);
+        return new Task($id, new LazyPromise(function () use ($handler, $arguments, $token) {
+            return $this->adapt($handler(...$arguments), $token);
         }), $token);
     }
 

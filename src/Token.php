@@ -13,23 +13,19 @@ declare(strict_types = 1);
 namespace PHPinnacle\Ensign;
 
 use Amp\CancellationTokenSource;
+use PHPinnacle\Identity\UUID;
 
 final class Token
 {
     /**
+     * @var UUID
+     */
+    private $id;
+
+    /**
      * @var CancellationTokenSource
      */
     private $source;
-
-    /**
-     * @var \Amp\CancellationToken
-     */
-    private $token;
-
-    /**
-     * @var int
-     */
-    private $task;
 
     /**
      * @var string
@@ -37,22 +33,20 @@ final class Token
     private $reason;
 
     /**
-     * TaskToken constructor.
+     * @param UUID $id
      */
-    public function __construct()
+    public function __construct(UUID $id)
     {
+        $this->id     = $id;
         $this->source = new CancellationTokenSource();
-        $this->token  = $this->source->getToken();
     }
 
     /**
-     * @param int    $task
      * @param string $reason
      * @return void
      */
-    public function cancel(int $task, string $reason): void
+    public function cancel(string $reason = null): void
     {
-        $this->task   = $task;
         $this->reason = $reason;
 
         $this->source->cancel();
@@ -63,8 +57,8 @@ final class Token
      */
     public function guard(): void
     {
-        if ($this->token->isRequested()) {
-            throw new Exception\TaskCanceled($this->task, $this->reason);
-        };
+        if ($this->source->getToken()->isRequested()) {
+            throw new Exception\TaskCanceled((string) $this->id, $this->reason);
+        }
     }
 }

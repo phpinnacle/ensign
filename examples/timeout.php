@@ -7,7 +7,7 @@ use PHPinnacle\Ensign\Exception\TaskTimeout;
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = Dispatcher::instance();
+    $dispatcher = new Dispatcher();
     $dispatcher
         ->register('endless', function (string $sign) {
             while (true) {
