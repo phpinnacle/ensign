@@ -15,11 +15,12 @@ namespace PHPinnacle\Ensign;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
+use PHPinnacle\Identity\UUID;
 
 final class Task implements Promise
 {
     /**
-     * @var int
+     * @var UUID
      */
     private $id;
 
@@ -34,11 +35,11 @@ final class Task implements Promise
     private $token;
 
     /**
-     * @param int     $id
+     * @param UUID    $id
      * @param Promise $promise
      * @param Token   $token
      */
-    public function __construct(int $id, Promise $promise, Token $token)
+    public function __construct(UUID $id, Promise $promise, Token $token)
     {
         $this->id      = $id;
         $this->promise = $promise;
@@ -46,9 +47,9 @@ final class Task implements Promise
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function id(): int
+    public function id(): UUID
     {
         return $this->id;
     }
@@ -58,9 +59,9 @@ final class Task implements Promise
      *
      * @return Task
      */
-    public function cancel(string $reason = ''): self
+    public function cancel(string $reason = null): self
     {
-        $this->token->cancel($this->id, $reason);
+        $this->token->cancel($reason);
 
         return $this;
     }
@@ -82,7 +83,7 @@ final class Task implements Promise
 
             $resolved = true;
 
-            $deferred->fail(new Exception\TaskTimeout($this->id));
+            $deferred->fail(new Exception\TaskTimeout((string) $this->id));
         });
 
         $promise = $this->promise;

@@ -12,7 +12,6 @@ namespace PHPinnacle\Ensign\Tests\Amp;
 
 use Amp\Delayed;
 use PHPinnacle\Ensign\Processor;
-use PHPinnacle\Ensign\Task;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
 class ProcessorTest extends EnsignTest
@@ -29,10 +28,9 @@ class ProcessorTest extends EnsignTest
 
             $task = $processor->execute(function ($value) {
                 return $value * 2;
-            }, 21);
+            }, [ 21 ]);
 
-            self::assertInstanceOf(Task::class, $task);
-            self::assertEquals(1, $task->id());
+            self::assertTask($task);
             self::assertEquals(42, yield $task);
         });
     }
@@ -51,10 +49,9 @@ class ProcessorTest extends EnsignTest
                 yield new Delayed(10);
 
                 return $value * 2;
-            }, 21);
+            }, [ 21 ]);
 
-            self::assertInstanceOf(Task::class, $task);
-            self::assertEquals(1, $task->id());
+            self::assertTask($task);
             self::assertEquals(42, yield $task);
         });
     }

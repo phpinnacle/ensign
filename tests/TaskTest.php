@@ -16,6 +16,7 @@ use Amp\Success;
 use PHPinnacle\Ensign\Task;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use PHPinnacle\Ensign\Token;
+use PHPinnacle\Identity\UUID;
 
 class TaskTest extends EnsignTest
 {
@@ -28,7 +29,8 @@ class TaskTest extends EnsignTest
     public function cancel()
     {
         self::loop(function () {
-            $task = new Task(1, new Success(), new Token());
+            $id   = UUID::random();
+            $task = new Task($id, new Success(), new Token($id));
             $task->cancel();
 
             yield $task;
@@ -44,7 +46,8 @@ class TaskTest extends EnsignTest
     public function timeout()
     {
         self::loop(function () {
-            $task = new Task(1, new Delayed(100, true), new Token());
+            $id   = UUID::random();
+            $task = new Task($id, new Delayed(100, true), new Token($id));
             $task->timeout(10);
 
             yield $task;
@@ -59,7 +62,8 @@ class TaskTest extends EnsignTest
     public function fast()
     {
         self::loop(function () {
-            $task = new Task(1, new Success(true), new Token());
+            $id   = UUID::random();
+            $task = new Task($id, new Success(true), new Token($id));
             $task->timeout(100);
 
             self::assertTrue(yield $task);

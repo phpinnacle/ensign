@@ -17,7 +17,7 @@ function __ensign_dispatcher(): Dispatcher
 {
     static $dispatcher;
 
-    return $dispatcher ?: $dispatcher = Dispatcher::instance();
+    return $dispatcher ?: $dispatcher = new Dispatcher();
 }
 
 /**
