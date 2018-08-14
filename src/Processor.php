@@ -16,7 +16,7 @@ use Amp\LazyPromise;
 use Amp\Coroutine;
 use PHPinnacle\Identity\UUID;
 
-final class Processor
+final class Processor implements Contract\Processor
 {
     /**
      * @var callable[]
@@ -24,16 +24,11 @@ final class Processor
     private $interruptions = [];
 
     /**
-     * @param string   $interrupt
-     * @param callable $handler
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function interrupt(string $interrupt, callable $handler): self
+    public function interrupt(string $interrupt, callable $handler): void
     {
         $this->interruptions[$interrupt] = $handler;
-
-        return $this;
     }
 
     /**

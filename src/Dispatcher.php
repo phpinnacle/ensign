@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-final class Dispatcher
+final class Dispatcher implements Contract\Dispatcher
 {
     /**
      * @var Processor
@@ -33,20 +33,15 @@ final class Dispatcher
     }
 
     /**
-     * @param string   $signal
-     * @param callable $handler
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function register(string $signal, callable $handler): self
+    public function register(string $signal, callable $handler): void
     {
         $this->handlers[$signal] = $handler;
 
         $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
         });
-
-        return $this;
     }
 
     /**
@@ -60,7 +55,7 @@ final class Dispatcher
             $signal = \get_class($signal);
         }
 
-        $handler = $this->handlers[$signal] ?? function () use ($signal) {
+        $handler = $this->handlers[$signal] ?? static function () use ($signal) {
             throw new Exception\UnknownSignal($signal);
         };
 

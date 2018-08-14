@@ -23,14 +23,12 @@ class DispatcherTest extends EnsignTest
     {
         self::loop(function () {
             $dispatcher = new Dispatcher();
-            $dispatcher
-                ->register('upper', function ($text) {
-                    return strtoupper($text);
-                })
-                ->register('lower', function ($text) {
-                    return strtolower($text);
-                })
-            ;
+            $dispatcher->register('upper', function ($text) {
+                return strtoupper($text);
+            });
+            $dispatcher->register('lower', function ($text) {
+                return strtolower($text);
+            });
 
             self::assertTask($upperTask = $dispatcher->dispatch('upper', 'test'));
             self::assertTask($lowerTask = $dispatcher->dispatch('lower', 'TEST'));
@@ -49,11 +47,9 @@ class DispatcherTest extends EnsignTest
     {
         self::loop(function () {
             $dispatcher = new Dispatcher();
-            $dispatcher
-                ->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
-                    return strtoupper($event->data);
-                })
-            ;
+            $dispatcher->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+                return strtoupper($event->data);
+            });
 
             self::assertTask($task = $dispatcher->dispatch(new Stub\SimpleEvent('test')));
             self::assertEquals('TEST', yield $task);
@@ -69,26 +65,24 @@ class DispatcherTest extends EnsignTest
     {
         self::loop(function () {
             $dispatcher = new Dispatcher();
-            $dispatcher
-                ->register('coroutine', function ($count) {
-                    try {
-                        yield 'error' => $count;
-                    } catch (\Exception $error) {
-                        self::assertInstanceOf(\InvalidArgumentException::class, $error);
-                        self::assertEquals('3', $error->getMessage());
-                    }
+            $dispatcher->register('coroutine', function ($count) {
+                try {
+                    yield 'error' => $count;
+                } catch (\Exception $error) {
+                    self::assertInstanceOf(\InvalidArgumentException::class, $error);
+                    self::assertEquals('3', $error->getMessage());
+                }
 
-                    yield new Stub\SimpleEvent($count + 1);
+                yield new Stub\SimpleEvent($count + 1);
 
-                    return $count * 2;
-                })
-                ->register('error', function ($num) {
-                    throw new \InvalidArgumentException((string) $num);
-                })
-                ->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
-                    self::assertEquals(4, $event->data);
-                })
-            ;
+                return $count * 2;
+            });
+            $dispatcher->register('error', function ($num) {
+                throw new \InvalidArgumentException((string) $num);
+            });
+            $dispatcher->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+                self::assertEquals(4, $event->data);
+            });
 
             self::assertTask($task = $dispatcher->dispatch('coroutine', 3));
             self::assertEquals(6, yield $task);
@@ -122,11 +116,9 @@ class DispatcherTest extends EnsignTest
     {
         self::loop(function () {
             $dispatcher = new Dispatcher();
-            $dispatcher
-                ->register('invalid', function () {
-                    yield 'test';
-                })
-            ;
+            $dispatcher->register('invalid', function () {
+                yield 'test';
+            });
 
             yield $dispatcher->dispatch('invalid');
         });
