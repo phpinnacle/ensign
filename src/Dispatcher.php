@@ -35,13 +35,15 @@ final class Dispatcher implements Contract\Dispatcher
     /**
      * {@inheritdoc}
      */
-    public function register(string $signal, callable $handler): void
+    public function register(string $signal, callable $handler): Contract\Dispatcher
     {
         $this->handlers[$signal] = $handler;
 
         $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
         });
+
+        return $this;
     }
 
     /**

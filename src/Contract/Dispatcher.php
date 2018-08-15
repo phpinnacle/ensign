@@ -20,9 +20,9 @@ interface Dispatcher
      * @param string   $signal
      * @param callable $handler
      *
-     * @return void
+     * @return self
      */
-    public function register(string $signal, callable $handler): void;
+    public function register(string $signal, callable $handler): self;
 
     /**
      * @param mixed       $signal
