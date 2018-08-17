@@ -14,7 +14,7 @@ use Amp\Delayed;
 use PHPinnacle\Ensign\Processor;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 
-class ProcessorTest extends EnsignTest
+class SimpleProcessorTest extends EnsignTest
 {
     /**
      * Test that Processor can execute callable
@@ -24,7 +24,7 @@ class ProcessorTest extends EnsignTest
     public function execute()
     {
         $this->loop(function () {
-            $processor = new Processor();
+            $processor = new Processor\SimpleProcessor();
 
             $task = $processor->execute(function ($value) {
                 return $value * 2;
@@ -43,7 +43,7 @@ class ProcessorTest extends EnsignTest
     public function coroutine()
     {
         $this->loop(function () {
-            $processor = new Processor();
+            $processor = new Processor\SimpleProcessor();
 
             $task = $processor->execute(function ($value) {
                 yield new Delayed(10);

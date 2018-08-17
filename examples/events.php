@@ -46,7 +46,7 @@ class Publisher
 }
 
 Amp\Loop::run(function () {
-    $processor = new Processor();
+    $processor = new Processor\SimpleProcessor();
 
     $publisher = new Publisher($processor);
     $publisher

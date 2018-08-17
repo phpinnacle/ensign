@@ -29,7 +29,7 @@ final class Dispatcher implements Contract\Dispatcher
      */
     public function __construct(Processor $processor = null)
     {
-        $this->processor = $processor ?: new Processor();
+        $this->processor = $processor ?: new Processor\SimpleProcessor();
     }
 
     /**
@@ -49,7 +49,7 @@ final class Dispatcher implements Contract\Dispatcher
     /**
      * {@inheritdoc}
      */
-    public function dispatch($signal, ...$arguments): Task
+    public function dispatch($signal, ...$arguments): Action
     {
         if (\is_object($signal)) {
             \array_unshift($arguments, $signal);

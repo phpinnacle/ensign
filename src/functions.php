@@ -11,7 +11,7 @@
 declare(strict_types = 1);
 
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Task;
+use PHPinnacle\Ensign\Action;
 
 function __ensign_dispatcher(): Dispatcher
 {
@@ -33,9 +33,9 @@ function ensign_signal(string $signal, callable $handler): void
  * @param string    $signal
  * @param mixed  ...$arguments
  *
- * @return Task
+ * @return Action
  */
-function ensign_dispatch(string $signal, ...$arguments): Task
+function ensign_dispatch(string $signal, ...$arguments): Action
 {
     return __ensign_dispatcher()->dispatch($signal, ...$arguments);
 }

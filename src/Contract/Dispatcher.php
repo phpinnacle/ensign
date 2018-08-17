@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Contract;
 
-use PHPinnacle\Ensign\Task;
+use PHPinnacle\Ensign\Action;
 
 interface Dispatcher
 {
@@ -28,7 +28,7 @@ interface Dispatcher
      * @param mixed       $signal
      * @param mixed    ...$arguments
      *
-     * @return Task
+     * @return Action
      */
-    public function dispatch($signal, ...$arguments): Task;
+    public function dispatch($signal, ...$arguments): Action;
 }

@@ -2,7 +2,7 @@
 
 use Amp\Delayed;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Exception\TaskTimeout;
+use PHPinnacle\Ensign\Exception\ActionTimeout;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,7 +20,7 @@ Amp\Loop::run(function () {
 
     try {
         yield $dispatcher->dispatch('endless', '.')->timeout(500);
-    } catch (TaskTimeout $exception) {
+    } catch (ActionTimeout $exception) {
         exit(\PHP_EOL . $exception->getMessage());
     }
 });
