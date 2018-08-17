@@ -15,9 +15,9 @@ namespace PHPinnacle\Ensign;
 final class Dispatcher implements Contract\Dispatcher
 {
     /**
-     * @var Processor
+     * @var Kernel
      */
-    private $processor;
+    private $kernel;
 
     /**
      * @var callable[]
@@ -25,11 +25,11 @@ final class Dispatcher implements Contract\Dispatcher
     private $handlers = [];
 
     /**
-     * @param Processor $processor
+     * @param Kernel $kernel
      */
-    public function __construct(Processor $processor = null)
+    public function __construct(Kernel $kernel = null)
     {
-        $this->processor = $processor ?: new Processor\SimpleProcessor();
+        $this->kernel = $kernel ?: new Kernel();
     }
 
     /**
@@ -39,7 +39,7 @@ final class Dispatcher implements Contract\Dispatcher
     {
         $this->handlers[$signal] = $handler;
 
-        $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
+        $this->kernel->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
         });
 
@@ -61,6 +61,6 @@ final class Dispatcher implements Contract\Dispatcher
             throw new Exception\UnknownSignal($signal);
         };
 
-        return $this->processor->execute($handler, $arguments);
+        return $this->kernel->execute($handler, $arguments);
     }
 }

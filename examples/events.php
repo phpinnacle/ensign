@@ -2,7 +2,7 @@
 
 use Amp\Delayed;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Processor;
+use PHPinnacle\Ensign\Kernel;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,12 +20,12 @@ class Publish
 
 class Publisher
 {
-    private $processor;
+    private $kernel;
     private $listeners = [];
 
-    public function __construct(Processor $processor)
+    public function __construct(Kernel $kernel)
     {
-        $this->processor = $processor;
+        $this->kernel = $kernel;
     }
 
     public function listen(string $signal, callable $listener): self
@@ -37,18 +37,17 @@ class Publisher
 
     public function __invoke(Publish $message)
     {
-        $listeners = $this->listeners[$message->signal] ?? [];
+        $actions = \array_map(function ($listener) use ($message) {
+            return $this->kernel->execute($listener, $message->arguments);
+        }, $this->listeners[$message->signal] ?? []);
 
-        yield \array_map(function ($listener) use ($message) {
-            return $this->processor->execute($listener, $message->arguments);
-        }, $listeners);
+        yield $actions;
     }
 }
 
 Amp\Loop::run(function () {
-    $processor = new Processor\SimpleProcessor();
-
-    $publisher = new Publisher($processor);
+    $kernel = new Kernel();
+    $publisher = new Publisher($kernel);
     $publisher
         ->listen('print', function ($num) {
             for ($i = 0; $i < $num; $i++) {
@@ -73,7 +72,7 @@ Amp\Loop::run(function () {
         })
     ;
 
-    $dispatcher = new Dispatcher($processor);
+    $dispatcher = new Dispatcher($kernel);
     $dispatcher
         ->register(Publish::class, $publisher)
     ;

@@ -12,23 +12,13 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Contract;
 
-use PHPinnacle\Ensign\Action;
-
 interface Processor
 {
-    /**
-     * @param string   $interrupt
-     * @param callable $handler
-     *
-     * @return void
-     */
-    public function interrupt(string $interrupt, callable $handler): void;
-
     /**
      * @param callable $handler
      * @param array    $arguments
      *
-     * @return Action
+     * @return mixed
      */
-    public function execute(callable $handler, array $arguments): Action;
+    public function execute(callable $handler, array $arguments);
 }
