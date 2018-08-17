@@ -8,13 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace PHPinnacle\Ensign\Tests\Amp;
+namespace PHPinnacle\Ensign\Tests;
 
 use Amp\Delayed;
-use PHPinnacle\Ensign\Processor;
-use PHPinnacle\Ensign\Tests\EnsignTest;
+use PHPinnacle\Ensign\Kernel;
 
-class SimpleProcessorTest extends EnsignTest
+class KernelTest extends EnsignTest
 {
     /**
      * Test that Processor can execute callable
@@ -24,9 +23,9 @@ class SimpleProcessorTest extends EnsignTest
     public function execute()
     {
         $this->loop(function () {
-            $processor = new Processor\SimpleProcessor();
+            $kernel = new Kernel();
 
-            $task = $processor->execute(function ($value) {
+            $task = $kernel->execute(function ($value) {
                 return $value * 2;
             }, [ 21 ]);
 
@@ -43,9 +42,9 @@ class SimpleProcessorTest extends EnsignTest
     public function coroutine()
     {
         $this->loop(function () {
-            $processor = new Processor\SimpleProcessor();
+            $kernel = new Kernel();
 
-            $task = $processor->execute(function ($value) {
+            $task = $kernel->execute(function ($value) {
                 yield new Delayed(10);
 
                 return $value * 2;

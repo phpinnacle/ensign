@@ -16,10 +16,9 @@ use Amp\Parallel\Worker\DefaultPool;
 use Amp\Parallel\Worker\Pool;
 use Amp\ParallelFunctions;
 use Amp\Promise;
-use PHPinnacle\Ensign\Processor;
-use PHPinnacle\Ensign\Token;
+use PHPinnacle\Ensign\Contract;
 
-final class ParallelProcessor extends Processor
+final class ParallelProcessor implements Contract\Processor
 {
     /**
      * @var Pool
@@ -45,12 +44,10 @@ final class ParallelProcessor extends Processor
     /**
      * {@inheritdoc}
      */
-    protected function process(callable $handler, array $arguments, Token $token): callable
+    public function execute(callable $handler, array $arguments)
     {
-        return function () use ($handler, $arguments, $token) {
-            $parallel = ParallelFunctions\parallel($handler, $this->pool);
+        $parallel = ParallelFunctions\parallel($handler, $this->pool);
 
-            return $parallel(...$arguments);
-        };
+        return $parallel(...$arguments);
     }
 }
