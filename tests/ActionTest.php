@@ -10,27 +10,26 @@
 
 namespace PHPinnacle\Ensign\Tests\Amp;
 
-use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Success;
-use PHPinnacle\Ensign\Task;
+use PHPinnacle\Ensign\Action;
 use PHPinnacle\Ensign\Tests\EnsignTest;
 use PHPinnacle\Ensign\Token;
 use PHPinnacle\Identity\UUID;
 
-class TaskTest extends EnsignTest
+class ActionTest extends EnsignTest
 {
     /**
      * Test that Task can be canceled
      *
      * @test
-     * @expectedException \PHPinnacle\Ensign\Exception\TaskCanceled
+     * @expectedException \PHPinnacle\Ensign\Exception\ActionCanceled
      */
     public function cancel()
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Task($id, new Success(), new Token($id));
+            $task = new Action($id, new Success(), new Token($id));
             $task->cancel();
 
             yield $task;
@@ -41,13 +40,13 @@ class TaskTest extends EnsignTest
      * Test that Task throw exception when timeout reached
      *
      * @test
-     * @expectedException \PHPinnacle\Ensign\Exception\TaskTimeout
+     * @expectedException \PHPinnacle\Ensign\Exception\ActionTimeout
      */
     public function timeout()
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Task($id, new Delayed(100, true), new Token($id));
+            $task = new Action($id, new Delayed(100, true), new Token($id));
             $task->timeout(10);
 
             yield $task;
@@ -63,7 +62,7 @@ class TaskTest extends EnsignTest
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Task($id, new Success(true), new Token($id));
+            $task = new Action($id, new Success(true), new Token($id));
             $task->timeout(100);
 
             self::assertTrue(yield $task);

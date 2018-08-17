@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Exception;
 
-final class TaskCanceled extends EnsignException
+final class ActionCanceled extends EnsignException
 {
     /**
      * @param string $id
@@ -20,6 +20,6 @@ final class TaskCanceled extends EnsignException
      */
     public function __construct(string $id, string $reason = null)
     {
-        parent::__construct($reason ?: sprintf('Task "%s" was cancelled.', $id));
+        parent::__construct($reason ?: sprintf('Action "%s" was cancelled.', $id));
     }
 }

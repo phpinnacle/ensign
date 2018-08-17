@@ -58,7 +58,7 @@ final class Token
     public function guard(): void
     {
         if ($this->source->getToken()->isRequested()) {
-            throw new Exception\TaskCanceled((string) $this->id, $this->reason);
+            throw new Exception\ActionCanceled((string) $this->id, $this->reason);
         }
     }
 }

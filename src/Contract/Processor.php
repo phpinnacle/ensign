@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Contract;
 
-use PHPinnacle\Ensign\Task;
+use PHPinnacle\Ensign\Action;
 
 interface Processor
 {
@@ -28,7 +28,7 @@ interface Processor
      * @param callable $handler
      * @param array    $arguments
      *
-     * @return Task
+     * @return Action
      */
-    public function execute(callable $handler, array $arguments): Task;
+    public function execute(callable $handler, array $arguments): Action;
 }

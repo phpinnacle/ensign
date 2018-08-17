@@ -13,15 +13,14 @@ declare(strict_types = 1);
 namespace PHPinnacle\Ensign;
 
 use Amp\LazyPromise;
-use Amp\Coroutine;
 use PHPinnacle\Identity\UUID;
 
-final class Processor implements Contract\Processor
+abstract class Processor implements Contract\Processor
 {
     /**
      * @var callable[]
      */
-    private $interruptions = [];
+    protected $interruptions = [];
 
     /**
      * {@inheritdoc}
@@ -34,73 +33,22 @@ final class Processor implements Contract\Processor
     /**
      * {@inheritdoc}
      */
-    public function execute(callable $handler, array $arguments): Task
+    public function execute(callable $handler, array $arguments): Action
     {
-        $id    = UUID::random();
-        $token = new Token($id);
+        $id = UUID::random();
 
-        return new Task($id, new LazyPromise(function () use ($handler, $arguments, $token) {
-            return $this->adapt($handler(...$arguments), $token);
-        }), $token);
+        $token   = new Token($id);
+        $promise = new LazyPromise($this->process($handler, $arguments, $token));
+
+        return new Action($id, $promise, $token);
     }
 
     /**
-     * @param mixed $value
-     * @param Token $token
+     * @param callable $handler
+     * @param array    $arguments
+     * @param Token    $token
      *
-     * @return mixed
+     * @return callable
      */
-    private function adapt($value, Token $token)
-    {
-        return $value instanceof \Generator ? new Coroutine($this->recoil($value, $token)) : $value;
-    }
-
-    /**
-     * @param \Generator $generator
-     * @param Token      $token
-     *
-     * @return mixed
-     */
-    private function recoil(\Generator $generator, Token $token)
-    {
-        while ($generator->valid()) {
-            $token->guard();
-
-            try {
-                $value = $this->intercept($generator->key(), $generator->current());
-
-                $generator->send(yield $this->adapt($value, $token));
-            } catch (\Exception $error) {
-                /** @scrutinizer ignore-call */
-                $generator->throw($error);
-            }
-        }
-
-        return $this->adapt($generator->getReturn(), $token);
-    }
-
-    /**
-     * @param int|string $key
-     * @param mixed      $value
-     *
-     * @return mixed
-     */
-    private function intercept($key, $value)
-    {
-        $interrupt = \is_string($key) ? $key : $value;
-
-        if (\is_object($interrupt)) {
-            $interrupt = \get_class($interrupt);
-        }
-
-        if (!\is_string($interrupt) || !isset($this->interruptions[$interrupt])) {
-            return $value;
-        }
-
-        $interceptor = $this->interruptions[$interrupt];
-
-        $value = \is_array($value) ? $value : [$value];
-
-        return $interceptor(...$value);
-    }
+    abstract protected function process(callable $handler, array $arguments, Token $token): callable;
 }

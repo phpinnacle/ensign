@@ -17,7 +17,7 @@ use Amp\Loop;
 use Amp\Promise;
 use PHPinnacle\Identity\UUID;
 
-final class Task implements Promise
+final class Action implements Promise
 {
     /**
      * @var UUID
@@ -57,7 +57,7 @@ final class Task implements Promise
     /**
      * @param string $reason
      *
-     * @return Task
+     * @return Action
      */
     public function cancel(string $reason = null): self
     {
@@ -83,7 +83,7 @@ final class Task implements Promise
 
             $resolved = true;
 
-            $deferred->fail(new Exception\TaskTimeout((string) $this->id));
+            $deferred->fail(new Exception\ActionTimeout((string) $this->id));
         });
 
         $promise = $this->promise;

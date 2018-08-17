@@ -18,6 +18,8 @@
     "require": {
         "php": "^7.1",
         "amphp/amp": "^2.0",
+        "amphp/parallel": "^0.2.5",
+        "amphp/parallel-functions": "^0.1.2",
         "phpinnacle/identity": "^0.1.0"
     },
     "require-dev": {
