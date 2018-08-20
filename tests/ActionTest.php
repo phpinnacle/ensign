@@ -20,7 +20,7 @@ use PHPinnacle\Identity\UUID;
 class ActionTest extends EnsignTest
 {
     /**
-     * Test that Task can be canceled
+     * Test that Action can be canceled
      *
      * @test
      * @expectedException \PHPinnacle\Ensign\Exception\ActionCanceled
@@ -29,15 +29,15 @@ class ActionTest extends EnsignTest
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Action($id, new Success(), new Token($id));
-            $task->cancel();
+            $action = new Action($id, new Success(), new Token($id));
+            $action->cancel();
 
-            yield $task;
+            yield $action;
         });
     }
 
     /**
-     * Test that Task throw exception when timeout reached
+     * Test that Action throw exception when timeout reached
      *
      * @test
      * @expectedException \PHPinnacle\Ensign\Exception\ActionTimeout
@@ -46,15 +46,15 @@ class ActionTest extends EnsignTest
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Action($id, new Delayed(100, true), new Token($id));
-            $task->timeout(10);
+            $action = new Action($id, new Delayed(100, true), new Token($id));
+            $action->timeout(10);
 
-            yield $task;
+            yield $action;
         });
     }
 
     /**
-     * Test that Task can has timeout
+     * Test that Action can has timeout
      *
      * @test
      */
@@ -62,10 +62,10 @@ class ActionTest extends EnsignTest
     {
         self::loop(function () {
             $id   = UUID::random();
-            $task = new Action($id, new Success(true), new Token($id));
-            $task->timeout(100);
+            $action = new Action($id, new Success(true), new Token($id));
+            $action->timeout(100);
 
-            self::assertTrue(yield $task);
+            self::assertTrue(yield $action);
         });
     }
 }

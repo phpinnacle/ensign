@@ -30,11 +30,11 @@ class DispatcherTest extends EnsignTest
                 return strtolower($text);
             });
 
-            self::assertTask($upperTask = $dispatcher->dispatch('upper', 'test'));
-            self::assertTask($lowerTask = $dispatcher->dispatch('lower', 'TEST'));
+            self::assertAction($upperAction = $dispatcher->dispatch('upper', 'test'));
+            self::assertAction($lowerAction = $dispatcher->dispatch('lower', 'TEST'));
 
-            self::assertEquals('TEST', yield $upperTask);
-            self::assertEquals('test', yield $lowerTask);
+            self::assertEquals('TEST', yield $upperAction);
+            self::assertEquals('test', yield $lowerAction);
         });
     }
 
@@ -51,8 +51,8 @@ class DispatcherTest extends EnsignTest
                 return strtoupper($event->data);
             });
 
-            self::assertTask($task = $dispatcher->dispatch(new Stub\SimpleEvent('test')));
-            self::assertEquals('TEST', yield $task);
+            self::assertAction($action = $dispatcher->dispatch(new Stub\SimpleEvent('test')));
+            self::assertEquals('TEST', yield $action);
         });
     }
 
@@ -84,8 +84,8 @@ class DispatcherTest extends EnsignTest
                 self::assertEquals(4, $event->data);
             });
 
-            self::assertTask($task = $dispatcher->dispatch('coroutine', 3));
-            self::assertEquals(6, yield $task);
+            self::assertAction($action = $dispatcher->dispatch('coroutine', 3));
+            self::assertEquals(6, yield $action);
         });
     }
 
@@ -100,7 +100,7 @@ class DispatcherTest extends EnsignTest
         self::loop(function () {
             $dispatcher = new Dispatcher();
 
-            self::assertTask($failure = $dispatcher->dispatch('unknown'));
+            self::assertAction($failure = $dispatcher->dispatch('unknown'));
 
             yield $failure;
         });

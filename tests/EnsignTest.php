@@ -42,7 +42,7 @@ abstract class EnsignTest extends TestCase
      *
      * @return void
      */
-    public static function assertTask($value): void
+    public static function assertAction($value): void
     {
         self::assertInstanceOf(Action::class, $value);
     }

@@ -25,12 +25,12 @@ class KernelTest extends EnsignTest
         $this->loop(function () {
             $kernel = new Kernel();
 
-            $task = $kernel->execute(function ($value) {
+            $action = $kernel->execute(function ($value) {
                 return $value * 2;
             }, [ 21 ]);
 
-            self::assertTask($task);
-            self::assertEquals(42, yield $task);
+            self::assertAction($action);
+            self::assertEquals(42, yield $action);
         });
     }
 
@@ -44,14 +44,14 @@ class KernelTest extends EnsignTest
         $this->loop(function () {
             $kernel = new Kernel();
 
-            $task = $kernel->execute(function ($value) {
+            $action = $kernel->execute(function ($value) {
                 yield new Delayed(10);
 
                 return $value * 2;
             }, [ 21 ]);
 
-            self::assertTask($task);
-            self::assertEquals(42, yield $task);
+            self::assertAction($action);
+            self::assertEquals(42, yield $action);
         });
     }
 }

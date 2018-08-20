@@ -44,8 +44,7 @@ Amp\Loop::run(function () {
         })
     ;
 
-    $task = $dispatcher->dispatch(new SimpleCommand(10));
-    $data = yield $task;
+    $data = yield $dispatcher->dispatch(new SimpleCommand(10));
 
-    echo \sprintf('Task resolved with value: %d at %s' . \PHP_EOL, $data, \microtime(true));
+    echo \sprintf('Action resolved with value: %d at %s' . \PHP_EOL, $data, \microtime(true));
 });

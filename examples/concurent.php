@@ -20,12 +20,12 @@ Amp\Loop::run(function () {
     ;
 
     $times   = \rand(5, 10);
-    $taskOne = $dispatcher->dispatch('emit', '-', $times, 100);
-    $taskTwo = $dispatcher->dispatch('emit', '+', $times + \rand(5, 10), 100);
+    $actionOne = $dispatcher->dispatch('emit', '-', $times, 100);
+    $actionTwo = $dispatcher->dispatch('emit', '+', $times + \rand(5, 10), 100);
 
-    [$resultOne, $resultTwo] = yield [$taskOne, $taskTwo];
+    [$resultOne, $resultTwo] = yield [$actionOne, $actionTwo];
 
     echo \PHP_EOL;
-    echo \sprintf('Task one done %d times.' . \PHP_EOL, $resultOne);
-    echo \sprintf('Task two done %d times.' . \PHP_EOL, $resultTwo);
+    echo \sprintf('Action one done %d times.' . \PHP_EOL, $resultOne);
+    echo \sprintf('Action two done %d times.' . \PHP_EOL, $resultTwo);
 });

@@ -33,9 +33,12 @@ final class Dispatcher implements Contract\Dispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * @param string   $signal
+     * @param callable $handler
+     *
+     * @return self
      */
-    public function register(string $signal, callable $handler): Contract\Dispatcher
+    public function register(string $signal, callable $handler): self
     {
         $this->handlers[$signal] = $handler;
 

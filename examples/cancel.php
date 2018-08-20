@@ -18,13 +18,13 @@ Amp\Loop::run(function () {
     ;
 
     try {
-        $task = $dispatcher->dispatch('endless', '.');
+        $action = $dispatcher->dispatch('endless', '.');
 
-        Amp\Loop::delay(500, function () use ($task) {
-            $task->cancel();
+        Amp\Loop::delay(500, function () use ($action) {
+            $action->cancel();
         });
 
-        yield $task;
+        yield $action;
     } catch (Exception $exception) {
         exit(\PHP_EOL . $exception->getMessage());
     }
