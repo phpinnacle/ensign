@@ -116,10 +116,8 @@ final class Kernel
             return $value;
         }
 
-        $interceptor = $this->interruptions[$interrupt];
-
         $value = \is_array($value) ? $value : [$value];
 
-        return $interceptor(...$value);
+        return $this->processor->execute($this->interruptions[$interrupt], $value);
     }
 }
