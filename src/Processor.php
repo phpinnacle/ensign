@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Contract;
+namespace PHPinnacle\Ensign;
 
 interface Processor
 {

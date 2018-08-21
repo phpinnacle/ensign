@@ -17,7 +17,7 @@ use PHPinnacle\Identity\UUID;
 final class Kernel
 {
     /**
-     * @var Contract\Processor
+     * @var Processor
      */
     private $processor;
 
@@ -27,9 +27,9 @@ final class Kernel
     private $interruptions = [];
 
     /**
-     * @param Contract\Processor $processor
+     * @param Processor $processor
      */
-    public function __construct(Contract\Processor $processor = null)
+    public function __construct(Processor $processor = null)
     {
         $this->processor = $processor ?: new Processor\SimpleProcessor();
     }

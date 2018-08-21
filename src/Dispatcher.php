@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
-final class Dispatcher implements Contract\Dispatcher
+final class Dispatcher
 {
     /**
      * @var Kernel

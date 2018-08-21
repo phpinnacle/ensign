@@ -16,9 +16,9 @@ use Amp\Parallel\Worker\DefaultPool;
 use Amp\Parallel\Worker\Pool;
 use Amp\ParallelFunctions;
 use Amp\Promise;
-use PHPinnacle\Ensign\Contract;
+use PHPinnacle\Ensign\Processor;
 
-final class ParallelProcessor implements Contract\Processor
+final class ParallelProcessor implements Processor
 {
     /**
      * @var Pool

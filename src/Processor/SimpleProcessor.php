@@ -12,9 +12,9 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Processor;
 
-use PHPinnacle\Ensign\Contract;
+use PHPinnacle\Ensign\Processor;
 
-final class SimpleProcessor implements Contract\Processor
+final class SimpleProcessor implements Processor
 {
     /**
      * {@inheritdoc}
