@@ -67,44 +67,6 @@ final class Action implements Promise
     }
 
     /**
-     * @param int $timeout
-     *
-     * @return self
-     */
-    public function timeout(int $timeout): self
-    {
-        $deferred = new Deferred;
-        $resolved = false;
-
-        $watcher = Loop::delay($timeout, function () use ($deferred, &$resolved) {
-            if ($resolved) {
-                return;
-            }
-
-            $resolved = true;
-
-            $deferred->fail(new Exception\ActionTimeout((string) $this->id));
-        });
-
-        $promise = $this->promise;
-        $promise->onResolve(function () use ($deferred, $watcher, &$resolved) {
-            if ($resolved) {
-                return;
-            }
-
-            $resolved = true;
-
-            Loop::cancel($watcher);
-
-            $deferred->resolve($this->promise);
-        });
-
-        $this->promise = $deferred->promise();
-
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function onResolve(callable $onResolved)
