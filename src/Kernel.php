@@ -12,6 +12,7 @@ namespace PHPinnacle\Ensign;
 
 use Amp\Coroutine;
 use Amp\LazyPromise;
+use PHPinnacle\Ensign\Exception\BadActionCall;
 use PHPinnacle\Identity\UUID;
 
 final class Kernel
@@ -82,6 +83,8 @@ final class Kernel
      */
     private function recoil(\Generator $generator, Token $token)
     {
+        $step = 1;
+
         while ($generator->valid()) {
             $token->guard();
 
@@ -90,12 +93,27 @@ final class Kernel
 
                 $generator->send(yield $this->adapt($value, $token));
             } catch (\Exception $error) {
-                /** @scrutinizer ignore-call */
-                $generator->throw($error);
+                $this->throw($generator, $error, $step);
+            } finally {
+                $step++;
             }
         }
 
         return $this->adapt($generator->getReturn(), $token);
+    }
+
+    /**
+     * @param \Generator $generator
+     * @param \Exception $error
+     * @param int        $step
+     */
+    private function throw(\Generator $generator, \Exception $error, int $step)
+    {
+        try {
+            $generator->throw($error);
+        } catch (\Throwable $error) {
+            throw new BadActionCall($step, $error);
+        }
     }
 
     /**
