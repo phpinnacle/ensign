@@ -10,17 +10,15 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Processor;
+namespace PHPinnacle\Ensign;
 
-use PHPinnacle\Ensign\Processor;
-
-final class SimpleProcessor implements Processor
+interface Executor
 {
     /**
-     * {@inheritdoc}
+     * @param callable $handler
+     * @param array    $arguments
+     *
+     * @return mixed
      */
-    public function execute(callable $handler, array $arguments)
-    {
-        return $handler(...$arguments);
-    }
+    public function execute(callable $handler, array $arguments);
 }

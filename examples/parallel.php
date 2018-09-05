@@ -1,8 +1,8 @@
 <?php
 
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Kernel;
 use PHPinnacle\Ensign\Processor;
+use PHPinnacle\Ensign\Executor;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -12,8 +12,8 @@ if (!function_exists('\Amp\ParallelFunctions\parallel')) {
 }
 
 Amp\Loop::run(function () {
-    $processor = new Processor\ParallelProcessor();
-    $dispatcher = new Dispatcher(new Kernel($processor));
+    $executor   = new Executor\ParallelExecutor();
+    $dispatcher = new Dispatcher(new Processor($executor));
     $dispatcher->register('load', function ($url) {
         echo "Start getting: {$url}" . \PHP_EOL;
 
@@ -27,5 +27,5 @@ Amp\Loop::run(function () {
     $actionThree = $dispatcher->dispatch('load', 'https://amphp.org');
 
     yield [$actionOne, $actionTwo, $actionThree];
-    yield $processor->shutdown();
+    yield $executor->shutdown();
 });
