@@ -11,9 +11,9 @@
 namespace PHPinnacle\Ensign\Tests;
 
 use Amp\Delayed;
-use PHPinnacle\Ensign\Kernel;
+use PHPinnacle\Ensign\Processor;
 
-class KernelTest extends EnsignTest
+class ProcessorTest extends EnsignTest
 {
     /**
      * Test that Processor can execute callable
@@ -23,7 +23,7 @@ class KernelTest extends EnsignTest
     public function execute()
     {
         $this->loop(function () {
-            $kernel = new Kernel();
+            $kernel = new Processor();
 
             $action = $kernel->execute(function ($value) {
                 return $value * 2;
@@ -42,7 +42,7 @@ class KernelTest extends EnsignTest
     public function coroutine()
     {
         $this->loop(function () {
-            $kernel = new Kernel();
+            $kernel = new Processor();
 
             $action = $kernel->execute(function ($value) {
                 yield new Delayed(10);

@@ -15,9 +15,9 @@ namespace PHPinnacle\Ensign;
 final class Dispatcher
 {
     /**
-     * @var Kernel
+     * @var Processor
      */
-    private $kernel;
+    private $processor;
 
     /**
      * @var callable[]
@@ -25,11 +25,11 @@ final class Dispatcher
     private $handlers = [];
 
     /**
-     * @param Kernel $kernel
+     * @param Processor $processor
      */
-    public function __construct(Kernel $kernel = null)
+    public function __construct(Processor $processor = null)
     {
-        $this->kernel = $kernel ?: new Kernel();
+        $this->processor = $processor ?: new Processor();
     }
 
     /**
@@ -42,7 +42,7 @@ final class Dispatcher
     {
         $this->handlers[$signal] = $handler;
 
-        $this->kernel->interrupt($signal, function (...$arguments) use ($signal) {
+        $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
             return $this->dispatch($signal, ...$arguments);
         });
 
@@ -64,6 +64,6 @@ final class Dispatcher
             throw new Exception\UnknownSignal($signal);
         };
 
-        return $this->kernel->execute($handler, $arguments);
+        return $this->processor->execute($handler, $arguments);
     }
 }

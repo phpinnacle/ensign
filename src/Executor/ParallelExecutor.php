@@ -10,15 +10,15 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Processor;
+namespace PHPinnacle\Ensign\Executor;
 
 use Amp\Parallel\Worker\DefaultPool;
 use Amp\Parallel\Worker\Pool;
 use Amp\ParallelFunctions;
 use Amp\Promise;
-use PHPinnacle\Ensign\Processor;
+use PHPinnacle\Ensign\Executor;
 
-final class ParallelProcessor implements Processor
+final class ParallelExecutor implements Executor
 {
     /**
      * @var Pool

@@ -10,15 +10,17 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Exception;
+namespace PHPinnacle\Ensign\Executor;
 
-final class ActionTimeout extends EnsignException
+use PHPinnacle\Ensign\Executor;
+
+final class SimpleExecutor implements Executor
 {
     /**
-     * @param string $id
+     * {@inheritdoc}
      */
-    public function __construct(string $id)
+    public function execute(callable $handler, array $arguments)
     {
-        parent::__construct(sprintf('Action "%s" timed out.', $id));
+        return $handler(...$arguments);
     }
 }

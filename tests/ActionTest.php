@@ -35,37 +35,4 @@ class ActionTest extends EnsignTest
             yield $action;
         });
     }
-
-    /**
-     * Test that Action throw exception when timeout reached
-     *
-     * @test
-     * @expectedException \PHPinnacle\Ensign\Exception\ActionTimeout
-     */
-    public function timeout()
-    {
-        self::loop(function () {
-            $id   = UUID::random();
-            $action = new Action($id, new Delayed(100, true), new Token($id));
-            $action->timeout(10);
-
-            yield $action;
-        });
-    }
-
-    /**
-     * Test that Action can has timeout
-     *
-     * @test
-     */
-    public function fast()
-    {
-        self::loop(function () {
-            $id   = UUID::random();
-            $action = new Action($id, new Success(true), new Token($id));
-            $action->timeout(100);
-
-            self::assertTrue(yield $action);
-        });
-    }
 }
