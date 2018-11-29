@@ -12,7 +12,6 @@ namespace PHPinnacle\Ensign\Tests;
 
 use Amp\Loop;
 use Amp\Promise;
-use PHPinnacle\Ensign\Action;
 use PHPUnit\Framework\TestCase;
 
 abstract class EnsignTest extends TestCase
@@ -35,16 +34,6 @@ abstract class EnsignTest extends TestCase
     public static function assertPromise($value): void
     {
         self::assertInstanceOf(Promise::class, $value);
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public static function assertAction($value): void
-    {
-        self::assertInstanceOf(Action::class, $value);
     }
 
     /**

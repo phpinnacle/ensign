@@ -29,7 +29,7 @@ class ProcessorTest extends EnsignTest
                 return $value * 2;
             }, [ 21 ]);
 
-            self::assertAction($action);
+            self::assertPromise($action);
             self::assertEquals(42, yield $action);
         });
     }
@@ -50,7 +50,7 @@ class ProcessorTest extends EnsignTest
                 return $value * 2;
             }, [ 21 ]);
 
-            self::assertAction($action);
+            self::assertPromise($action);
             self::assertEquals(42, yield $action);
         });
     }

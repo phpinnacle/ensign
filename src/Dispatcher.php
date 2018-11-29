@@ -12,6 +12,8 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
+use Amp\Promise;
+
 final class Dispatcher
 {
     /**
@@ -29,7 +31,7 @@ final class Dispatcher
      */
     public function __construct(Processor $processor = null)
     {
-        $this->processor = $processor ?: new Processor();
+        $this->processor = $processor ?: new Processor;
     }
 
     /**
@@ -50,9 +52,12 @@ final class Dispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|object    $signal
+     * @param mixed[]       ...$arguments
+     *
+     * @return Promise
      */
-    public function dispatch($signal, ...$arguments): Action
+    public function dispatch($signal, ...$arguments): Promise
     {
         if (\is_object($signal)) {
             \array_unshift($arguments, $signal);

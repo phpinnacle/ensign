@@ -8,11 +8,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types = 1);
+
 namespace PHPinnacle\Ensign;
 
-use Amp\Coroutine;
-use Amp\LazyPromise;
-use PHPinnacle\Identity\UUID;
+use Amp;
+use Amp\Promise;
+use Amp\Success;
 
 final class Processor
 {
@@ -20,6 +22,11 @@ final class Processor
      * @var Executor
      */
     private $executor;
+
+    /**
+     * @var callable
+     */
+    private $resolver;
 
     /**
      * @var callable[]
@@ -31,7 +38,14 @@ final class Processor
      */
     public function __construct(Executor $executor = null)
     {
-        $this->executor = $executor ?: new Executor\SimpleExecutor();
+        $this->executor = $executor ?: new Executor\SimpleExecutor;
+        $this->resolver = function (string $interrupt, array $arguments) {
+            if (!isset($this->interruptions[$interrupt])) {
+                throw new Exception\UnknownInterrupt($interrupt);
+            }
+
+            return $this->execute($this->interruptions[$interrupt], $arguments);
+        };
     }
 
     /**
@@ -49,92 +63,18 @@ final class Processor
      * @param callable $handler
      * @param array    $arguments
      *
-     * @return Action
+     * @return Promise
      */
-    public function execute(callable $handler, array $arguments): Action
+    public function execute(callable $handler, array $arguments): Promise
     {
-        $id = UUID::random();
+        return Amp\call(function () use ($handler, $arguments) {
+            $result = $this->executor->execute($handler, $arguments);
 
-        $token   = new Token($id);
-        $promise = new LazyPromise(function () use ($handler, $arguments, $token) {
-            return $this->adapt($this->executor->execute($handler, $arguments), $token);
-        });
-
-        return new Action($id, $promise, $token);
-    }
-
-    /**
-     * @param mixed $value
-     * @param Token $token
-     *
-     * @return mixed
-     */
-    private function adapt($value, Token $token)
-    {
-        return $value instanceof \Generator ? new Coroutine($this->recoil($value, $token)) : $value;
-    }
-
-    /**
-     * @param \Generator $generator
-     * @param Token      $token
-     *
-     * @return mixed
-     */
-    private function recoil(\Generator $generator, Token $token)
-    {
-        $step = 1;
-
-        while ($generator->valid()) {
-            $token->guard();
-
-            try {
-                $value = $this->intercept($generator->key(), $generator->current());
-
-                $generator->send(yield $this->adapt($value, $token));
-            } catch (\Exception $error) {
-                $this->throw($generator, $error, $step);
-            } finally {
-                $step++;
+            if ($result instanceof \Generator) {
+                return new Subroutine($result, $this->resolver);
             }
-        }
 
-        return $this->adapt($generator->getReturn(), $token);
-    }
-
-    /**
-     * @param \Generator $generator
-     * @param \Exception $error
-     * @param int        $step
-     */
-    private function throw(\Generator $generator, \Exception $error, int $step)
-    {
-        try {
-            $generator->throw($error);
-        } catch (\Throwable $error) {
-            throw new Exception\BadActionCall($step, $error);
-        }
-    }
-
-    /**
-     * @param int|string $key
-     * @param mixed      $value
-     *
-     * @return mixed
-     */
-    private function intercept($key, $value)
-    {
-        $interrupt = \is_string($key) ? $key : $value;
-
-        if (\is_object($interrupt)) {
-            $interrupt = \get_class($interrupt);
-        }
-
-        if (!\is_string($interrupt) || !isset($this->interruptions[$interrupt])) {
-            return $value;
-        }
-
-        $value = \is_array($value) ? $value : [$value];
-
-        return $this->executor->execute($this->interruptions[$interrupt], $value);
+            return $result;
+        });
     }
 }
