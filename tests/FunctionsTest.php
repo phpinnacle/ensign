@@ -24,7 +24,7 @@ class FunctionsTest extends EnsignTest
                 return strtoupper($text);
             });
 
-            self::assertAction($upperAction = ensign_dispatch('upper', 'test'));
+            self::assertPromise($upperAction = ensign_dispatch('upper', 'test'));
             self::assertEquals('TEST', yield $upperAction);
         });
     }

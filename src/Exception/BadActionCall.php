@@ -16,9 +16,9 @@ final class BadActionCall extends EnsignException
 {
     /**
      * @param int        $step
-     * @param \Exception $error
+     * @param \Throwable $error
      */
-    public function __construct(int $step, \Exception $error)
+    public function __construct(int $step, \Throwable $error)
     {
         parent::__construct(sprintf('Bad action call at step "%d".', $step), 0, $error);
     }

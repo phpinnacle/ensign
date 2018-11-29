@@ -12,14 +12,13 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign\Exception;
 
-final class ActionCanceled extends EnsignException
+final class UnknownInterrupt extends EnsignException
 {
     /**
-     * @param string $id
-     * @param string $reason
+     * @param string $interrupt
      */
-    public function __construct(string $id, string $reason = null)
+    public function __construct(string $interrupt)
     {
-        parent::__construct($reason ?: sprintf('Action "%s" was cancelled.', $id));
+        parent::__construct(sprintf('Interrupt "%s" has no handler registered.', $interrupt));
     }
 }

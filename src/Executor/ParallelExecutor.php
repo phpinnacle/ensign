@@ -30,7 +30,7 @@ final class ParallelExecutor implements Executor
      */
     public function __construct(Pool $pool = null)
     {
-        $this->pool = $pool ?: new DefaultPool();
+        $this->pool = $pool ?: new DefaultPool;
     }
 
     /**

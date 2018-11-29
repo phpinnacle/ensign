@@ -10,8 +10,8 @@
 
 declare(strict_types = 1);
 
+use Amp\Promise;
 use PHPinnacle\Ensign\Dispatcher;
-use PHPinnacle\Ensign\Action;
 
 function __ensign_dispatcher(): Dispatcher
 {
@@ -33,9 +33,9 @@ function ensign_signal(string $signal, callable $handler): void
  * @param string    $signal
  * @param mixed  ...$arguments
  *
- * @return Action
+ * @return Promise
  */
-function ensign_dispatch(string $signal, ...$arguments): Action
+function ensign_dispatch(string $signal, ...$arguments): Promise
 {
     return __ensign_dispatcher()->dispatch($signal, ...$arguments);
 }
