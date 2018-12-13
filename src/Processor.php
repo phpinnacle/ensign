@@ -13,8 +13,8 @@ declare(strict_types = 1);
 namespace PHPinnacle\Ensign;
 
 use Amp;
+use Amp\Deferred;
 use Amp\Promise;
-use Amp\Success;
 
 final class Processor
 {
@@ -67,14 +67,22 @@ final class Processor
      */
     public function execute(callable $handler, array $arguments): Promise
     {
-        return Amp\call(function () use ($handler, $arguments) {
-            $result = $this->executor->execute($handler, $arguments);
+        $deferred = new Deferred;
 
-            if ($result instanceof \Generator) {
-                return new Subroutine($result, $this->resolver);
+        Amp\Loop::defer(function () use ($deferred, $handler, $arguments) {
+            try {
+                $result = $this->executor->execute($handler, $arguments);
+
+                if ($result instanceof \Generator) {
+                    $result = new Subroutine($result, $this->resolver);
+                }
+
+                $deferred->resolve($result);
+            } catch (\Throwable $error) {
+                $deferred->fail($error);
             }
-
-            return $result;
         });
+
+        return $deferred->promise();
     }
 }
