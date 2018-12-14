@@ -1,13 +1,13 @@
 <?php
 
 use Amp\Delayed;
-use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\DispatcherBuilder;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = new Dispatcher();
-    $dispatcher
+    $builder = new DispatcherBuilder;
+    $builder
         ->register('emit', function (string $string, int $num, int $delay = 100) {
             for ($i = 0; $i < $num; $i++) {
                 echo $string;
@@ -18,6 +18,8 @@ Amp\Loop::run(function () {
             return $num;
         })
     ;
+
+    $dispatcher = $builder->build();
 
     $times   = \rand(5, 10);
     $actionOne = $dispatcher->dispatch('emit', '-', $times, 100);

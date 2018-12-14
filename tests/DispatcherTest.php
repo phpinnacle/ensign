@@ -11,6 +11,7 @@
 namespace PHPinnacle\Ensign\Tests;
 
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\HandlerRegistry;
 
 class DispatcherTest extends EnsignTest
 {
@@ -22,13 +23,15 @@ class DispatcherTest extends EnsignTest
     public function dispatchSignals()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
-            $dispatcher->register('upper', function ($text) {
+            $handlers = new HandlerRegistry;
+            $handlers->add('upper', function ($text) {
                 return strtoupper($text);
             });
-            $dispatcher->register('lower', function ($text) {
+            $handlers->add('lower', function ($text) {
                 return strtolower($text);
             });
+
+            $dispatcher = new Dispatcher($handlers);
 
             self::assertPromise($upperAction = $dispatcher->dispatch('upper', 'test'));
             self::assertPromise($lowerAction = $dispatcher->dispatch('lower', 'TEST'));
@@ -46,8 +49,8 @@ class DispatcherTest extends EnsignTest
     public function dispatchAnyTypeSignals()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
-            $dispatcher->register('run', function () {
+            $handlers = new HandlerRegistry;
+            $handlers->add('run', function () {
                 // string syntax
                 self::assertEquals(1, yield 'one');
                 // string syntax with args
@@ -65,20 +68,22 @@ class DispatcherTest extends EnsignTest
                 // object full syntax with args array
                 self::assertEquals(['key' => 1], yield Stub\SimpleCommand::class => [new Stub\SimpleCommand('key'), 1]);
             });
-            $dispatcher->register('one', function () {
+            $handlers->add('one', function () {
                 return 1;
             });
-            $dispatcher->register('num', function (int $num) {
+            $handlers->add('num', function (int $num) {
                 return $num;
             });
-            $dispatcher->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+            $handlers->add(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
                 return $event->data;
             });
-            $dispatcher->register(Stub\SimpleCommand::class, function (Stub\SimpleCommand $command, $arg) {
+            $handlers->add(Stub\SimpleCommand::class, function (Stub\SimpleCommand $command, $arg) {
                 return [
                     $command->data => $arg,
                 ];
             });
+
+            $dispatcher = new Dispatcher($handlers);
 
             yield $dispatcher->dispatch('run');
         });
@@ -92,10 +97,12 @@ class DispatcherTest extends EnsignTest
     public function dispatchObject()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
-            $dispatcher->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+            $handlers = new HandlerRegistry;
+            $handlers->add(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
                 return strtoupper($event->data);
             });
+
+            $dispatcher = new Dispatcher($handlers);
 
             self::assertPromise($action = $dispatcher->dispatch(new Stub\SimpleEvent('test')));
             self::assertEquals('TEST', yield $action);
@@ -110,8 +117,8 @@ class DispatcherTest extends EnsignTest
     public function dispatchSignalFromCoroutine()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
-            $dispatcher->register('coroutine', function ($count) {
+            $handlers = new HandlerRegistry;
+            $handlers->add('coroutine', function ($count) {
                 try {
                     yield 'error' => $count;
                 } catch (\Exception $error) {
@@ -123,12 +130,14 @@ class DispatcherTest extends EnsignTest
 
                 return $count * 2;
             });
-            $dispatcher->register('error', function ($num) {
+            $handlers->add('error', function ($num) {
                 throw new \InvalidArgumentException((string) $num);
             });
-            $dispatcher->register(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
+            $handlers->add(Stub\SimpleEvent::class, function (Stub\SimpleEvent $event) {
                 self::assertEquals(4, $event->data);
             });
+
+            $dispatcher = new Dispatcher($handlers);
 
             self::assertPromise($action = $dispatcher->dispatch('coroutine', 3));
             self::assertEquals(6, yield $action);
@@ -144,7 +153,7 @@ class DispatcherTest extends EnsignTest
     public function dispatchUnknownSignal()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
+            $dispatcher = new Dispatcher(new HandlerRegistry);
 
             self::assertPromise($failure = $dispatcher->dispatch('unknown'));
 
@@ -161,10 +170,12 @@ class DispatcherTest extends EnsignTest
     public function yieldNotSignal()
     {
         self::loop(function () {
-            $dispatcher = new Dispatcher();
-            $dispatcher->register('invalid', function () {
-                yield 'test';
+            $handlers = new HandlerRegistry;
+            $handlers->add('invalid', function () {
+                yield 1;
             });
+
+            $dispatcher = new Dispatcher($handlers);
 
             yield $dispatcher->dispatch('invalid');
         });

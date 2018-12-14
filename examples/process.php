@@ -2,13 +2,14 @@
 
 use Amp\Delayed;
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\HandlerRegistry;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $dispatcher = new Dispatcher();
-    $dispatcher
-        ->register('spawn', function (callable $process) {
+    $handlers = new HandlerRegistry;
+    $handlers
+        ->add('spawn', function (callable $process) {
             static $pid = 1;
 
             $gen = $process($pid);
@@ -17,17 +18,19 @@ Amp\Loop::run(function () {
 
             return $pid++;
         })
-        ->register('send', function (int $pid, string $message, ...$arguments) {
+        ->add('send', function (int $pid, string $message, ...$arguments) {
             $signal = sprintf('%s.%d', $message, $pid);
 
             return yield $signal => $arguments;
         })
-        ->register('receive', function (int $pid, string $message, callable $handler) use ($dispatcher) {
+        ->add('receive', function (int $pid, string $message, callable $handler) use ($handlers) {
             $signal = sprintf('%s.%d', $message, $pid);
 
-            $dispatcher->register($signal, $handler);
+            $handlers->add($signal, $handler);
         })
     ;
+
+    $dispatcher = new Dispatcher($handlers);
 
     $receiver = yield $dispatcher->dispatch('spawn', function (int $pid) {
         yield 'receive' => [$pid, 'ping', function () {
