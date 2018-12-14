@@ -10,15 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace PHPinnacle\Ensign\Exception;
+namespace PHPinnacle\Ensign;
 
-final class UnknownInterrupt extends EnsignException
+interface HandlerWrapper
 {
     /**
-     * @param string $interrupt
+     * @param callable $handler
+     *
+     * @return callable
      */
-    public function __construct(string $interrupt)
-    {
-        parent::__construct(sprintf('Interrupt "%s" has no handler registered.', $interrupt));
-    }
+    public function wrap(callable $handler): callable;
 }

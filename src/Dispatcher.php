@@ -12,43 +12,25 @@ declare(strict_types = 1);
 
 namespace PHPinnacle\Ensign;
 
+use Amp\Coroutine;
+use Amp\Failure;
+use Amp\InvalidYieldError;
 use Amp\Promise;
+use Amp\Success;
 
 final class Dispatcher
 {
     /**
-     * @var Processor
+     * @var HandlerRegistry
      */
-    private $processor;
+    private $handlers;
 
     /**
-     * @var callable[]
+     * @param HandlerRegistry $handlers
      */
-    private $handlers = [];
-
-    /**
-     * @param Processor $processor
-     */
-    public function __construct(Processor $processor = null)
+    public function __construct(HandlerRegistry $handlers)
     {
-        $this->processor = $processor ?: new Processor;
-    }
-
-    /**
-     * @param string   $signal
-     * @param callable $handler
-     *
-     * @return self
-     */
-    public function register(string $signal, callable $handler): self
-    {
-        $this->handlers[$signal] = $handler;
-
-        $this->processor->interrupt($signal, function (...$arguments) use ($signal) {
-            return $this->dispatch($signal, ...$arguments);
-        });
-
-        return $this;
+        $this->handlers = $handlers;
     }
 
     /**
@@ -65,10 +47,114 @@ final class Dispatcher
             $signal = \get_class($signal);
         }
 
-        $handler = $this->handlers[$signal] ?? static function () use ($signal) {
-            throw new Exception\UnknownSignal($signal);
+        return $this->call($this->handlers->get($signal), $arguments);
+    }
+
+    /**
+     * @param callable $handler
+     * @param mixed[]  $arguments
+     *
+     * @return Promise
+     */
+    private function call(callable $handler, array $arguments): Promise
+    {
+        try {
+            $result = $handler(...$arguments);
+        } catch (\Throwable $error) {
+            return new Failure($error);
+        }
+
+        if ($result instanceof \Generator) {
+            return new Coroutine($this->recoil($result));
+        }
+
+        return $result instanceof Promise ? $result : new Success($result);
+    }
+
+    /**
+     * @param \Generator $generator
+     *
+     * @return \Generator
+     */
+    private function recoil(\Generator $generator): \Generator
+    {
+        $step = 0;
+
+        while ($generator->valid()) {
+            try {
+                // yield new Promise
+                // yield [$promiseOne, $promiseTwo]
+
+                // yield new Signal
+                // yield new Signal => 'arg'
+                // yield new Signal => ['arg', 'two']
+                // yield Signal::class => [new Signal, 'arg', 'two']
+                // yield 'signal'
+                // yield 'signal' => 'arg'
+                // yield 'signal' => ['arg', 'two']
+
+                // yield function () {...}
+                // yield function () {...} => ['arg', 'two']
+                $current = $generator->current();
+                $key     = $generator->key();
+
+                if ($key === $step) {
+                    $interrupt = $current;
+                    $arguments = [];
+                } else {
+                    $interrupt = $key;
+                    $arguments = \is_array($current) ? $current : [$current];
+
+                    $step--;
+                }
+
+                if (\is_callable($interrupt)) {
+                    $result = $this->call($interrupt, $arguments);
+                } elseif (\is_array($interrupt) || $interrupt instanceof Promise) {
+                    $result = yield $interrupt;
+                } elseif ($this->isKnownSignal($interrupt)) {
+                    $result = yield $this->dispatch($interrupt, ...$arguments);
+                } else {
+                    throw new Exception\InvalidYield($interrupt);
+                }
+
+                $generator->send($result);
+            } catch (\Throwable $error) {
+                $this->throw($generator, $error, $step);
+            } finally {
+                $step++;
+            }
         };
 
-        return $this->processor->execute($handler, $arguments);
+        return $generator->getReturn();
+    }
+
+    /**
+     * @param \Generator $generator
+     * @param \Throwable $error
+     * @param int        $step
+     *
+     * @return void
+     */
+    private function throw(\Generator $generator, \Throwable $error, int $step): void
+    {
+        try {
+            $generator->throw($error);
+        } catch (\Throwable $error) {
+            throw new Exception\BadActionCall($step, $error);
+        }
+    }
+
+    private function isKnownSignal($interrupt)
+    {
+        if (\is_object($interrupt)) {
+            $interrupt = \get_class($interrupt);
+        }
+
+        if (false === \is_string($interrupt)) {
+            return false;
+        }
+
+        return $this->handlers->has($interrupt);
     }
 }

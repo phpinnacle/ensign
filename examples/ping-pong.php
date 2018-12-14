@@ -1,6 +1,6 @@
 <?php
 
-use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\DispatcherBuilder;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -23,8 +23,8 @@ class Stop
 }
 
 Amp\Loop::run(function () {
-    $dispatcher = new Dispatcher();
-    $dispatcher
+    $builder = new DispatcherBuilder;
+    $builder
         ->register(Ping::class, function (Ping $cmd) {
             if ($cmd->times > 0) {
                 $cmd->times--;
@@ -45,6 +45,8 @@ Amp\Loop::run(function () {
             echo 'Stop!' . \PHP_EOL;
         })
     ;
+
+    $dispatcher = $builder->build();
 
     yield $dispatcher->dispatch(new Ping(\rand(2, 10)));
 });
