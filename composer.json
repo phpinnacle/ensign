@@ -21,11 +21,7 @@
         "psr/container": "^1.0"
     },
     "require-dev": {
-        "amphp/parallel-functions": "^0.1.3",
-        "phpunit/phpunit": "^6.0"
-    },
-    "suggest": {
-        "amphp/parallel-functions": "For using ParallelProcessor."
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {

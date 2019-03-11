@@ -11,16 +11,15 @@
 namespace PHPinnacle\Ensign\Tests;
 
 use PHPinnacle\Ensign\Dispatcher;
+use PHPinnacle\Ensign\Exception;
 use PHPinnacle\Ensign\HandlerRegistry;
 
 class DispatcherTest extends EnsignTest
 {
     /**
      * Test that Dispatcher can dispatch proper signals
-     *
-     * @test
      */
-    public function dispatchSignals()
+    public function testDispatchSignals()
     {
         self::loop(function () {
             $handlers = new HandlerRegistry;
@@ -43,10 +42,8 @@ class DispatcherTest extends EnsignTest
 
     /**
      * Test that Dispatcher can dispatch any type of signals
-     *
-     * @test
      */
-    public function dispatchAnyTypeSignals()
+    public function testDispatchAnyTypeSignals()
     {
         self::loop(function () {
             $handlers = new HandlerRegistry;
@@ -91,10 +88,8 @@ class DispatcherTest extends EnsignTest
 
     /**
      * Test that Dispatcher can dispatch object as signal
-     *
-     * @test
      */
-    public function dispatchObject()
+    public function testDispatchObject()
     {
         self::loop(function () {
             $handlers = new HandlerRegistry;
@@ -111,10 +106,8 @@ class DispatcherTest extends EnsignTest
 
     /**
      * Test that Dispatcher can dispatch signal from coroutine
-     *
-     * @test
      */
-    public function dispatchSignalFromCoroutine()
+    public function testDispatchSignalFromCoroutine()
     {
         self::loop(function () {
             $handlers = new HandlerRegistry;
@@ -146,12 +139,11 @@ class DispatcherTest extends EnsignTest
 
     /**
      * Test that Dispatcher can handle not registered signals
-     *
-     * @test
-     * @expectedException \PHPinnacle\Ensign\Exception\UnknownSignal
      */
-    public function dispatchUnknownSignal()
+    public function testDispatchUnknownSignal()
     {
+        self::expectException(Exception\UnknownSignal::class);
+
         self::loop(function () {
             $dispatcher = new Dispatcher(new HandlerRegistry);
 
@@ -163,12 +155,11 @@ class DispatcherTest extends EnsignTest
 
     /**
      * Test that Dispatcher can handle not registered signals
-     *
-     * @test
-     * @expectedException \PHPinnacle\Ensign\Exception\BadActionCall
      */
-    public function yieldNotSignal()
+    public function testYieldNotSignal()
     {
+        self::expectException(Exception\BadActionCall::class);
+
         self::loop(function () {
             $handlers = new HandlerRegistry;
             $handlers->add('invalid', function () {

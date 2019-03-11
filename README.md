@@ -25,27 +25,29 @@ $ composer require phpinnacle/ensign
 
 require __DIR__ . '/vendor/autoload.php';
 
+use PHPinnacle\Ensign\DispatcherBuilder;
+
 Amp\Loop::run(function () {
-    ensign_signal('upper', function ($text) {
-        return strtoupper($text);
-    });
+    $builder = new DispatcherBuilder;
+    $builder
+        ->register('upper', function (string $text) {
+            return \strtoupper($text);
+        })
+        ->register('lower', function (string $text) {
+            return \strtolower($text);
+        })
+    ;
 
-    ensign_signal('lower', function ($text) {
-        return strtolower($text);
-    });
+    $dispatcher = $builder->build();
 
-    $hello = yield ensign_dispatch('upper', 'hello');
-    $world = yield ensign_dispatch('lower', 'WORLD');
+    $hello = yield $dispatcher->dispatch('upper', 'hello');
+    $world = yield $dispatcher->dispatch('lower', 'WORLD');
 
     echo sprintf('%s %s!', $hello, $world);
 });
 ```
 
 More examples can be found in [`examples`](examples) directory.
-
-## Change log
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Testing
 
@@ -81,4 +83,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-code-quality]: https://scrutinizer-ci.com/g/phpinnacle/ensign
 [link-downloads]: https://packagist.org/packages/phpinnacle/ensign
 [link-author]: https://github.com/phpinnacle
-[link-contributors]: ../../contributors
+[link-contributors]: https://github.com/phpinnacle/ensign/graphs/contributors

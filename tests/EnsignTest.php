@@ -35,14 +35,4 @@ abstract class EnsignTest extends TestCase
     {
         self::assertInstanceOf(Promise::class, $value);
     }
-
-    /**
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public static function assertArray($value): void
-    {
-        self::assertInternalType('array', $value);
-    }
 }
